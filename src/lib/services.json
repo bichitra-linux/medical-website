@@ -1,0 +1,90 @@
+{
+    "categories": [
+      { "id": "all", "name": "All Services", "color": "blue" },
+      { "id": "preventive", "name": "Preventive", "color": "green" },
+      { "id": "diagnostic", "name": "Diagnostic", "color": "amber" },
+      { "id": "specialty", "name": "Specialty", "color": "purple" },
+      { "id": "surgical", "name": "Surgical", "color": "red" }
+    ],
+    "services": [
+      {
+        "id": 1,
+        "title": "Primary Care",
+        "description": "Comprehensive healthcare for all ages",
+        "category": "preventive",
+        "color": "blue",
+        "icon": "Stethoscope",
+        "features": [
+          "Annual physical examinations",
+          "Chronic disease management",
+          "Preventive health counseling"
+        ]
+      },
+      {
+        "id": 2,
+        "title": "Cardiology",
+        "description": "Heart health and cardiovascular care",
+        "category": "specialty",
+        "color": "red",
+        "icon": "Activity",
+        "features": [
+          "Cardiac evaluation and consultation",
+          "ECG and stress testing",
+          "Heart disease management"
+        ]
+      },
+      {
+        "id": 3,
+        "title": "Diagnostic Services",
+        "description": "Advanced testing and imaging",
+        "category": "diagnostic",
+        "color": "amber",
+        "icon": "Microscope",
+        "features": [
+          "Laboratory testing",
+          "X-rays and imaging",
+          "Ultrasound diagnostics"
+        ]
+      },
+      {
+        "id": 4,
+        "title": "Pediatrics",
+        "description": "Specialized care for children",
+        "category": "specialty",
+        "color": "green",
+        "icon": "Thermometer",
+        "features": [
+          "Well-child visits",
+          "Immunizations",
+          "Developmental screenings"
+        ]
+      },
+      {
+        "id": 5,
+        "title": "Emergency Care",
+        "description": "Urgent medical attention",
+        "category": "surgical",
+        "color": "red",
+        "icon": "Clock",
+        "badge": "24/7",
+        "features": [
+          "Immediate medical care",
+          "Trauma treatment",
+          "Critical care services"
+        ]
+      },
+      {
+        "id": 6,
+        "title": "Preventive Care",
+        "description": "Proactive health maintenance",
+        "category": "preventive",
+        "color": "green",
+        "icon": "ShieldCheck",
+        "features": [
+          "Health screenings",
+          "Vaccinations",
+          "Lifestyle counseling"
+        ]
+      }
+    ]
+  }

@@ -1,0 +1,30 @@
+{
+    "title": "Our Core Values",
+    "subtitle": "These principles guide our approach to healthcare and inform every decision we make",
+    "values": [
+      {
+        "id": "1",
+        "title": "Compassion",
+        "description": "We treat every patient with kindness, empathy, and respect, recognizing their unique needs and concerns.",
+        "icon": "Heart"
+      },
+      {
+        "id": "2",
+        "title": "Excellence",
+        "description": "We strive for the highest standards in medical care, continuously improving our skills and services.",
+        "icon": "ShieldCheck"
+      },
+      {
+        "id": "3",
+        "title": "Teamwork",
+        "description": "We collaborate across specialties to ensure comprehensive, coordinated care for all our patients.",
+        "icon": "Users"
+      },
+      {
+        "id": "4",
+        "title": "Innovation",
+        "description": "We embrace new medical advances and technologies to provide cutting-edge care and treatments.",
+        "icon": "Settings"
+      }
+    ]
+  }

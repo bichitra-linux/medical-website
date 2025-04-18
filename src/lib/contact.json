@@ -1,0 +1,69 @@
+{
+    "mainInfo": {
+      "title": "Get In Touch",
+      "description": "Our friendly staff is available to answer your questions and provide guidance on our services."
+    },
+    "phone": {
+      "title": "Phone",
+      "contacts": [
+        {
+          "label": "Main",
+          "value": "+977-1-4562923",
+          "href": "tel:+97714562923"
+        },
+        {
+          "label": "Appointments",
+          "value": "+977-1-4620574",
+          "href": "tel:+97714620574"
+        },
+        {
+            "label": "Contact",
+            "value": "+977-1-4620574",
+            "href": "tel:+97714620574"
+          }
+      ]
+    },
+    "email": {
+      "title": "Email",
+      "contacts": [
+        {
+          "label": "General",
+          "value": "purna554@gmail.com",
+          "href": "mailto:purna554@gmail.com"
+        },
+        {
+          "label": "Appointments",
+          "value": "appointments@purnachandradiagnostics.com",
+          "href": "mailto:appointments@purnachandradiagnostics.com"
+        }
+      ]
+    },
+    "location": {
+      "title": "Location",
+      "address": {
+        "line1": "Gaushala, Kathmandu, Nepal",
+        "line2": "Battisputali Road"
+      },
+      "directions": {
+        "text": "Get directions",
+        "href": "https://maps.app.goo.gl/m9tWFW8atUpou3RP8"
+      }
+    },
+    "hours": {
+      "title": "Hours",
+      "schedule": [
+        {
+          "days": "Sunday - Friday",
+          "hours": "8:00 AM - 6:00 PM"
+        },
+        {
+          "days": "Saturday",
+          "hours": "9:00 AM - 1:00 PM"
+        },
+        {
+          "days": "National Holidays",
+          "hours": "Closed"
+        }
+      ]
+    }
+  }

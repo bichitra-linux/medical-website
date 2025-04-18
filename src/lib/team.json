@@ -1,0 +1,123 @@
+{
+    "title": "Meet Our Team",
+    "subtitle": "Experienced professionals dedicated to providing the highest standard of healthcare",
+    "viewAllLink": "/team",
+    "viewAllText": "View All Team Members",
+    "categories": {
+      "doctors": {
+        "title": "Our Doctors",
+        "subtitle": "Specialized physicians committed to exceptional patient care",
+        "viewAllLink": "/doctors",
+        "viewAllText": "View All Doctors",
+        "members": [
+          {
+            "id": "d1",
+            "name": "Dr. Rebecca Johnson",
+            "title": "Founder & Chief Medical Officer",
+            "specialty": "Internal Medicine",
+            "bio": "Dr. Johnson brings over 25 years of medical experience and leadership, specializing in internal medicine.",
+            "image": "/images/team/dr-johnson.jpg",
+            "imageAlt": "Dr. Rebecca Johnson portrait",
+            "placeholderIcon": "User",
+            "socials": [
+              {
+                "platform": "linkedin",
+                "url": "/linkedin",
+                "icon": "Linkedin"
+              },
+              {
+                "platform": "twitter",
+                "url": "/twitter",
+                "icon": "Twitter"
+              }
+            ]
+          },
+          {
+            "id": "d2",
+            "name": "Dr. Michael Chen",
+            "title": "Medical Director",
+            "specialty": "Cardiology",
+            "bio": "With expertise in cardiology, Dr. Chen oversees our medical services and quality assurance programs.",
+            "image": "/images/team/dr-chen.jpg",
+            "imageAlt": "Dr. Michael Chen portrait",
+            "placeholderIcon": "User",
+            "socials": [
+              {
+                "platform": "linkedin",
+                "url": "/linkedin",
+                "icon": "Linkedin"
+              },
+              {
+                "platform": "twitter",
+                "url": "/twitter",
+                "icon": "Twitter"
+              }
+            ]
+          }
+        ]
+      },
+      "staff": {
+        "title": "Leadership & Staff",
+        "subtitle": "Administrative professionals ensuring smooth operations",
+        "viewAllLink": "/staff",
+        "viewAllText": "View All Staff",
+        "members": [
+          {
+            "id": "s1",
+            "name": "Sarah Williams",
+            "title": "Chief Operating Officer",
+            "bio": "Sarah leads our operations team, ensuring efficient service delivery and patient satisfaction.",
+            "image": "/images/team/sarah-williams.jpg",
+            "imageAlt": "Sarah Williams portrait",
+            "placeholderIcon": "User",
+            "socials": [
+              {
+                "platform": "linkedin",
+                "url": "/linkedin",
+                "icon": "Linkedin"
+              },
+              {
+                "platform": "twitter",
+                "url": "/twitter",
+                "icon": "Twitter"
+              }
+            ]
+          }
+        ]
+      },
+      "formerDoctors": {
+        "title": "Former Physicians",
+        "subtitle": "Doctors who have contributed to our growth over the years",
+        "members": [
+          {
+            "id": "fd1",
+            "name": "Dr. Jennifer Martinez",
+            "title": "Former Pediatrics Lead",
+            "years": "2008-2019",
+            "bio": "Dr. Martinez led our pediatrics department for over a decade before relocating to establish a children's clinic.",
+            "image": "/images/team/dr-martinez.jpg",
+            "imageAlt": "Dr. Jennifer Martinez portrait",
+            "placeholderIcon": "User",
+            "currentPosition": "Founder, Children's Wellness Center"
+          }
+        ]
+      },
+      "formerStaff": {
+        "title": "Former Staff Members",
+        "subtitle": "Team members who have been part of our journey",
+        "members": [
+          {
+            "id": "fs1",
+            "name": "Robert Taylor",
+            "title": "Former Technology Director",
+            "years": "2010-2022",
+            "bio": "Robert led our technology initiatives and digital transformation before moving into healthcare consulting.",
+            "image": "/images/team/robert-taylor.jpg",
+            "imageAlt": "Robert Taylor portrait",
+            "placeholderIcon": "User",
+            "currentPosition": "Healthcare Technology Consultant"
+          }
+        ]
+      }
+    }
+  }
