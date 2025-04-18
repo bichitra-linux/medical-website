@@ -1,39 +1,58 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 
-// This function can be marked `async` if using `await` inside
-export function middleware(request: NextRequest) {
-  // Get the pathname of the request (e.g. /admin, /admin/dashboard)
-  const path = request.nextUrl.pathname;
+// Create explicit route matchers for better type safety
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/about',
+  '/contact',
+  '/services(.*)',
+  '/doctors(.*)',
+  '/appointment(.*)',
+  '/blog(.*)',
+  '/admin/login',
+  '/admin/register',
+  '/admin/forgot-password',
+  '/api/public(.*)'
+]);
+
+const isProtectedRoute = createRouteMatcher([
+  '/admin(.*)'
+]);
+
+export default clerkMiddleware({
+  // Define routes that don't require authentication
+  publicRoutes: [
+    '/',
+    '/about',
+    '/contact',
+    '/services(.*)',
+    '/doctors(.*)',
+    '/appointment(.*)',
+    '/blog(.*)',
+    '/admin/login',
+    '/admin/register',
+    '/admin/forgot-password',
+    '/api/public(.*)'
+  ],
   
-  // If it's an admin route and not the login page
-  if (path.startsWith('/admin') && path !== '/admin/login') {
-    // Check if the user has a token in the cookies
-    // For Firebase auth, you typically check for a session cookie or token
-    const token = request.cookies.get('auth-token')?.value;
-    
-    // If there's no token, redirect to the login page
-    if (!token) {
-      const url = new URL('/admin/login', request.url);
-      // You can pass the original URL as a parameter to redirect back after login
-      url.searchParams.set('from', path);
-      return NextResponse.redirect(url);
+  afterAuth(auth, req, evt) {
+    // Handle authenticated requests
+    if (!auth.userId && isProtectedRoute(req.url) && !isPublicRoute(req.url)) {
+      const signInUrl = new URL('/admin/login', req.url);
+      signInUrl.searchParams.set('redirect_url', req.url);
+      return Response.redirect(signInUrl);
     }
     
-    // If there is a token, continue to the page
-    return NextResponse.next();
+    // If user is signed in but tries to access auth pages, redirect to dashboard
+    if (auth.userId && 
+       (req.url.includes('/admin/login') || 
+        req.url.includes('/admin/register') || 
+        req.url.includes('/admin/forgot-password'))) {
+      return Response.redirect(new URL('/admin/dashboard', req.url));
+    }
   }
-  
-  // Continue for non-admin routes
-  return NextResponse.next();
-}
+});
 
-// Configure middleware to run only on specific paths
 export const config = {
-  matcher: [
-    // Match all admin routes except login
-    '/admin/:path*',
-    // Exclude api routes and static files
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)']
 };

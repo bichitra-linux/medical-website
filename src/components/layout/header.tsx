@@ -4,11 +4,16 @@ import Image from "next/image";
 import { Button } from "../ui/button";
 import { useRouter } from "next/router";
 import contactData from "@/lib/contact.json"; // Adjust the import path as necessary
+import { usePathname } from "next/navigation";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  
+  const isAdmin = pathname.startsWith('/admin') || pathname.startsWith('/dashboard') || pathname.startsWith('/auth') || pathname.startsWith('/login') || pathname.startsWith('/register');
 
   // Handle scroll effect for enhanced header appearance
   useEffect(() => {
@@ -28,6 +33,10 @@ const Header = () => {
   useEffect(() => {
     setIsMenuOpen(false);
   }, [router.asPath]);
+
+  if(isAdmin) {
+    return null; // Prevent rendering if the component is not mounted
+  }
 
   return (
     <header
@@ -53,7 +62,7 @@ const Header = () => {
                   }}
                 />
               </div>
-              <span className="text-blue-600 text-2xl font-bold">Purna Chandra Diagnostics</span>
+              <span className="text-blue-600 text-2xl font-bold">Purna Chandra Diagnostic</span>
             </Link>
           </div>
 

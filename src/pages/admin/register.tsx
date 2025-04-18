@@ -1,17 +1,17 @@
-import { SignIn } from "@clerk/nextjs";
+import { SignUp } from "@clerk/nextjs";
 import Head from "next/head";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 
-export default function AdminLogin() {
+export default function AdminRegister() {
   return (
     <>
       <Head>
-        <title>Admin Login | Medical Center</title>
+        <title>Admin Registration | Medical Center</title>
         <meta
           name="description"
-          content="Secure admin login for the medical center management system"
+          content="Register as admin for the medical center management system"
         />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
@@ -20,7 +20,7 @@ export default function AdminLogin() {
         {/* Background with gradient */}
         <div className="fixed inset-0 bg-gradient-to-br from-blue-50 via-white to-gray-50 z-0" />
 
-        {/* Login container */}
+        {/* Registration container */}
         <div className="relative z-10 flex-grow flex items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
           <div className="w-full max-w-md space-y-10">
             {/* Logo and header */}
@@ -36,15 +36,15 @@ export default function AdminLogin() {
                   />
                 </div>
               </div>
-              <h1 className="text-3xl font-extrabold text-gray-900">Admin Portal</h1>
+              <h1 className="text-3xl font-extrabold text-gray-900">Admin Registration</h1>
               <p className="mt-3 text-base text-gray-500">
-                Secure access to the website management system
+                Create an account to manage the medical center system
               </p>
             </div>
 
-            {/* Clerk SignIn component with custom appearance - UPDATED with hash routing */}
+            {/* Clerk SignUp component with custom appearance */}
             <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 p-6">
-              <SignIn
+              <SignUp
                 appearance={{
                   elements: {
                     formButtonPrimary:
@@ -59,21 +59,21 @@ export default function AdminLogin() {
                   },
                 }}
                 routing="hash"
-                signUpUrl="/admin/register"
+                signInUrl="/admin/login"
                 redirectUrl="/admin/dashboard"
               />
             </div>
 
-            {/* Back to website link */}
+            {/* Back to login link */}
             <div className="text-center">
               <Link
-                href="/"
+                href="/admin/login"
                 className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 
                          bg-white py-2 px-4 border border-gray-200 rounded-md shadow-sm
                          hover:bg-gray-50 transition-colors duration-150"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" aria-hidden="true" />
-                Back to website
+                Back to login
               </Link>
             </div>
 

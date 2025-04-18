@@ -1,53 +1,17 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { Menu, X, User, LogOut, Home, Settings } from 'lucide-react';
+import { UserButton } from '@clerk/nextjs';
+import { Menu, X, Home, Settings } from 'lucide-react';
 
 export default function AdminHeader() {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-  const userButtonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
-
-  // Handle click outside to close dropdowns
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (
-        userMenuRef.current && 
-        userButtonRef.current && 
-        !userMenuRef.current.contains(event.target as Node) && 
-        !userButtonRef.current.contains(event.target as Node)
-      ) {
-        setShowUserMenu(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   // Close mobile menu when route changes
   useEffect(() => {
     setShowMobileMenu(false);
   }, [router.pathname]);
-
-  const handleLogout = () => {
-    // Implement logout logic here
-    console.log('Logging out...');
-    // Example: signOut() from next-auth or Firebase
-    // router.push('/admin/login');
-  };
-
-  // Handle keyboard navigation for the user dropdown
-  const handleUserMenuKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      setShowUserMenu(false);
-      userButtonRef.current?.focus();
-    }
-  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
@@ -78,50 +42,21 @@ export default function AdminHeader() {
               className="flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md"
               aria-label="Go to dashboard"
             >
-              <span className="text-blue-600 font-bold text-xl">Medical Admin</span>
+              <span className="text-blue-600 font-bold text-xl">Purna Chandra Diagnostic Center Admin</span>
             </Link>
           </div>
 
-          {/* User Profile */}
+          {/* User Profile - Clerk UserButton */}
           <div className="flex items-center">
-            <div className="relative">
-              <button
-                ref={userButtonRef}
-                type="button"
-                className="flex items-center text-sm text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full"
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                aria-expanded={showUserMenu}
-                aria-haspopup="true"
-                aria-label="User menu"
-              >
-                <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                  <User className="h-5 w-5" aria-hidden="true" />
-                </div>
-              </button>
-
-              {/* User dropdown */}
-              {showUserMenu && (
-                <div 
-                  ref={userMenuRef}
-                  className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none transform transition-all"
-                  role="menu"
-                  aria-orientation="vertical"
-                  aria-labelledby="user-menu-button"
-                  tabIndex={-1}
-                  onKeyDown={handleUserMenuKeyDown}
-                >
-                  <button
-                    onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
-                    role="menuitem"
-                    tabIndex={0}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
-                    Sign out
-                  </button>
-                </div>
-              )}
-            </div>
+            <UserButton 
+              afterSignOutUrl="/admin/login" 
+              appearance={{
+                elements: {
+                  userButtonAvatarBox: "w-9 h-9",
+                  userButtonTrigger: "focus:shadow-outline-blue focus:outline-none"
+                }
+              }}
+            />
           </div>
         </div>
       </div>

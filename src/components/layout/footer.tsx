@@ -3,8 +3,21 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  const isAdmin =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/auth") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register");
+
+  if (isAdmin) {
+    return null; // Prevent rendering if the component is not mounted
+  }
   return (
     <footer className="bg-gray-50 border-t border-gray-200">
       <div className="container mx-auto px-4 py-12 md:py-16">
