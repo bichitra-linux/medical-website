@@ -80,7 +80,7 @@ export default function AdminLogin() {
             {/* Footer */}
             <footer className="mt-8 text-center">
               <p className="text-xs text-gray-500">
-                &copy; {new Date().getFullYear()} Medical Center. All rights reserved.
+                &copy; {new Date().getFullYear()} Purna Chandra Diagnostic Center. All rights reserved.
               </p>
               <div className="mt-2 flex justify-center space-x-4">
                 <Link
