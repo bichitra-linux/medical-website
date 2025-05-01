@@ -151,7 +151,7 @@ export default function AppointmentsPage() {
   };
 
   return (
-    <AdminLayout>
+    <>
       <Head>
         <title>Appointments | Medical Admin</title>
       </Head>
@@ -309,6 +309,6 @@ export default function AppointmentsPage() {
           </table>
         </div>
       )}
-    </AdminLayout>
+    </>
   );
 }

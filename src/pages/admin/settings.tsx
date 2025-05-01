@@ -136,7 +136,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <AdminLayout>
+    <>
       <Head>
         <title>Settings | Medical Admin</title>
       </Head>
@@ -434,6 +434,6 @@ export default function SettingsPage() {
           )}
         </div>
       )}
-    </AdminLayout>
+    </>
   );
 }

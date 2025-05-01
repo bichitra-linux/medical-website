@@ -1,15 +1,16 @@
-import { JSX, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { 
-  LayoutDashboard, 
-  Calendar, 
-  FileText, 
-  Image, 
-  Settings, 
+import { JSX, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import {
+  LayoutDashboard,
+  Calendar,
+  FileText,
+  Image,
+  Settings,
   ChevronRight,
-  ChevronDown
-} from 'lucide-react';
+  ChevronDown,
+  User,
+} from "lucide-react";
 
 // Define types for navigation items
 type NavItem = {
@@ -38,51 +39,49 @@ export default function AdminSidebar() {
   const navCategories: NavCategory[] = [
     {
       items: [
-        { 
-          name: 'Dashboard', 
-          href: '/admin/dashboard', 
-          icon: <LayoutDashboard size={20} /> 
+        {
+          name: "Dashboard",
+          href: "/admin/dashboard",
+          icon: <LayoutDashboard size={20} />,
         },
-      ]
+      ],
     },
     {
-      title: 'Management',
+      title: "Management",
       items: [
-        { 
-          name: 'Appointments', 
-          href: '/admin/appointments', 
-          icon: <Calendar size={20} />,
-          children: [
-            { name: 'All Appointments', href: '/admin/appointments' },
-            { name: 'Create New', href: '/admin/appointments/new' },
-          ]
+        {
+          name: "Appointments",
+          href: "/admin/appointments",
+          icon: <Calendar size={20} />
+          
         },
-        { 
-          name: 'Services', 
-          href: '/admin/services', 
+        {
+          name: "Services",
+          href: "/admin/services",
           icon: <FileText size={20} />,
-          children: [
-            { name: 'All Services', href: '/admin/services' },
-            { name: 'Add Service', href: '/admin/services/new' },
-          ]
         },
-        { 
-          name: 'Gallery', 
-          href: '/admin/gallery', 
-          icon: <Image size={20} /> 
+        {
+          name: "Staffs",
+          href: "/admin/staffs",
+          icon: <User size={20} />,
         },
-      ]
+        {
+          name: "Gallery",
+          href: "/admin/gallery",
+          icon: <Image size={20} />,
+        },
+      ],
     },
     {
-      title: 'System',
+      title: "System",
       items: [
-        { 
-          name: 'Settings', 
-          href: '/admin/settings', 
-          icon: <Settings size={20} /> 
+        {
+          name: "Settings",
+          href: "/admin/settings",
+          icon: <Settings size={20} />,
         },
-      ]
-    }
+      ],
+    },
   ];
 
   // Function to check if a link is active
@@ -92,10 +91,8 @@ export default function AdminSidebar() {
 
   // Toggle expanded state for items with children
   const toggleExpand = (name: string) => {
-    setExpandedItems((prev) => 
-      prev.includes(name) 
-        ? prev.filter(item => item !== name) 
-        : [...prev, name]
+    setExpandedItems((prev) =>
+      prev.includes(name) ? prev.filter((item) => item !== name) : [...prev, name]
     );
   };
 
@@ -126,8 +123,8 @@ export default function AdminSidebar() {
                             onClick={() => toggleExpand(item.name)}
                             className={`w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md ${
                               isActive(item.href)
-                                ? 'bg-blue-50 text-blue-600'
-                                : 'text-gray-700 hover:bg-gray-50'
+                                ? "bg-blue-50 text-blue-600"
+                                : "text-gray-700 hover:bg-gray-50"
                             }`}
                             aria-expanded={isExpanded(item.name, item.href)}
                             aria-controls={`${item.name}-submenu`}
@@ -142,23 +139,20 @@ export default function AdminSidebar() {
                               <ChevronRight size={16} />
                             )}
                           </button>
-                          
+
                           {/* Submenu */}
                           {isExpanded(item.name, item.href) && (
-                            <ul 
-                              id={`${item.name}-submenu`} 
-                              className="ml-9 mt-1 space-y-1"
-                            >
+                            <ul id={`${item.name}-submenu`} className="ml-9 mt-1 space-y-1">
                               {item.children.map((subItem) => (
                                 <li key={subItem.name}>
                                   <Link
                                     href={subItem.href}
                                     className={`block px-4 py-1.5 text-sm rounded-md ${
                                       isActive(subItem.href)
-                                        ? 'text-blue-600 font-medium'
-                                        : 'text-gray-600 hover:text-gray-900'
+                                        ? "text-blue-600 font-medium"
+                                        : "text-gray-600 hover:text-gray-900"
                                     }`}
-                                    aria-current={isActive(subItem.href) ? 'page' : undefined}
+                                    aria-current={isActive(subItem.href) ? "page" : undefined}
                                   >
                                     {subItem.name}
                                   </Link>
@@ -173,10 +167,10 @@ export default function AdminSidebar() {
                           href={item.href}
                           className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                             isActive(item.href)
-                              ? 'bg-blue-50 text-blue-600'
-                              : 'text-gray-700 hover:bg-gray-50'
+                              ? "bg-blue-50 text-blue-600"
+                              : "text-gray-700 hover:bg-gray-50"
                           }`}
-                          aria-current={isActive(item.href) ? 'page' : undefined}
+                          aria-current={isActive(item.href) ? "page" : undefined}
                         >
                           <span className="mr-3">{item.icon}</span>
                           {item.name}

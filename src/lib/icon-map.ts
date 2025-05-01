@@ -1,6 +1,6 @@
 import * as LucideIcons from "lucide-react";
 
 // Create a type-safe icon map with all Lucide icons
-const iconMap: Record<string, React.FC<any>> = { ...LucideIcons };
+const iconMap = { ...LucideIcons } as unknown as Record<string, React.FC<any>>;
 
 export default iconMap;

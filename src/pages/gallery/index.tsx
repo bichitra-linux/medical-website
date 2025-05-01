@@ -4,136 +4,23 @@ import Image from "next/image";
 import { Tab } from "@headlessui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { InstagramEmbed, TwitterEmbed, FacebookEmbed } from "react-social-media-embed";
-import { X, ChevronLeft, ChevronRight, Instagram, Facebook, Twitter } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, Instagram, Facebook, Twitter, Loader } from "lucide-react";
 
 // Type definitions for gallery data
+type Category = "facility" | "team" | "events";
+
 type GalleryImage = {
-  id: number;
+  id: string;
   src: string;
   alt: string;
   title: string;
   width: number;
   height: number;
+  category: Category;
 };
-
-type GalleryCategory = 'facility' | 'team' | 'events'; // Union type of allowed categories
 
 type GalleryData = {
-  [key in GalleryCategory]: GalleryImage[];
-};
-
-// Gallery data - in a real application, this might come from an API or CMS
-const galleryData: GalleryData = {
-  facility: [
-    {
-      id: 1,
-      src: "/images/gallery/facility-1.jpg",
-      alt: "Reception area",
-      title: "Modern Reception",
-      width: 1200,
-      height: 800,
-    },
-    {
-      id: 2,
-      src: "/images/gallery/facility-2.jpg",
-      alt: "Waiting room",
-      title: "Comfortable Waiting Area",
-      width: 1200,
-      height: 800,
-    },
-    {
-      id: 3,
-      src: "/images/gallery/facility-3.jpg",
-      alt: "Examination room",
-      title: "Examination Room",
-      width: 1200,
-      height: 800,
-    },
-    {
-      id: 4,
-      src: "/images/gallery/facility-4.jpg",
-      alt: "Diagnostic equipment",
-      title: "State-of-the-art Equipment",
-      width: 1200,
-      height: 800,
-    },
-    {
-      id: 5,
-      src: "/images/gallery/facility-5.jpg",
-      alt: "Laboratory",
-      title: "Modern Laboratory",
-      width: 1200,
-      height: 800,
-    },
-    {
-      id: 6,
-      src: "/images/gallery/facility-6.jpg",
-      alt: "Building exterior",
-      title: "Our Building",
-      width: 1200,
-      height: 800,
-    },
-  ],
-  team: [
-    {
-      id: 7,
-      src: "/images/gallery/team-1.jpg",
-      alt: "Doctor consultation",
-      title: "Doctor Consultation",
-      width: 1200,
-      height: 800,
-    },
-    {
-      id: 8,
-      src: "/images/gallery/team-2.jpg",
-      alt: "Medical team meeting",
-      title: "Team Meeting",
-      width: 1200,
-      height: 800,
-    },
-    {
-      id: 9,
-      src: "/images/gallery/team-3.jpg",
-      alt: "Staff at reception",
-      title: "Friendly Staff",
-      width: 1200,
-      height: 800,
-    },
-    {
-      id: 10,
-      src: "/images/gallery/team-4.jpg",
-      alt: "Lab technicians",
-      title: "Lab Technicians",
-      width: 1200,
-      height: 800,
-    },
-  ],
-  events: [
-    {
-      id: 11,
-      src: "/images/gallery/event-1.jpg",
-      alt: "Health camp",
-      title: "Community Health Camp",
-      width: 1200,
-      height: 800,
-    },
-    {
-      id: 12,
-      src: "/images/gallery/event-2.jpg",
-      alt: "Medical seminar",
-      title: "Medical Education Seminar",
-      width: 1200,
-      height: 800,
-    },
-    {
-      id: 13,
-      src: "/images/gallery/event-3.jpg",
-      alt: "Blood donation",
-      title: "Blood Donation Drive",
-      width: 1200,
-      height: 800,
-    },
-  ],
+  [key in Category]: GalleryImage[];
 };
 
 // Social media posts to embed
@@ -144,19 +31,68 @@ const socialMediaPosts = {
 };
 
 export default function GalleryPage() {
+  const [galleryData, setGalleryData] = useState<GalleryData>({
+    facility: [],
+    team: [],
+    events: [],
+  });
   const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
-  const [currentCategory, setCurrentCategory] = useState<GalleryCategory>("facility");
+  const [currentCategory, setCurrentCategory] = useState<Category>("facility");
   const [isLoading, setIsLoading] = useState(true);
   const [loadingError, setLoadingError] = useState<string | null>(null);
 
-  // Simulate loading images
+  // Fetch gallery images from Cloudinary
   useEffect(() => {
-    setLoadingError(null);
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [currentCategory]);
+    const fetchAllImages = async () => {
+      setIsLoading(true);
+      setLoadingError(null);
+      
+      try {
+        const [facilityData, teamData, eventsData] = await Promise.all([
+          fetchCategoryImages("facility"),
+          fetchCategoryImages("team"),
+          fetchCategoryImages("events"),
+        ]);
+        
+        setGalleryData({
+          facility: facilityData,
+          team: teamData,
+          events: eventsData,
+        });
+      } catch (error) {
+        console.error("Error fetching gallery images:", error);
+        setLoadingError("Failed to load gallery images. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchAllImages();
+  }, []);
+  
+  // Function to fetch images for a specific category
+  const fetchCategoryImages = async (category: Category): Promise<GalleryImage[]> => {
+    try {
+      const response = await fetch(`/api/cloudinary/list?folder=gallery/${category}`);
+      if (!response.ok) throw new Error(`Failed to fetch ${category} images`);
+      
+      const data = await response.json();
+      if (!data.resources || !Array.isArray(data.resources)) return [];
+      
+      return data.resources.map((resource: any) => ({
+        id: resource.public_id,
+        src: resource.secure_url,
+        alt: resource.context?.alt || resource.public_id.split('/').pop(),
+        title: resource.context?.caption || resource.public_id.split('/').pop(),
+        width: resource.width,
+        height: resource.height,
+        category: category,
+      }));
+    } catch (error) {
+      console.error(`Error fetching ${category} images:`, error);
+      return [];
+    }
+  };
 
   // Function to open the lightbox
   const openLightbox = (image: GalleryImage) => {
@@ -217,10 +153,8 @@ export default function GalleryPage() {
   }, [selectedImage, currentCategory]);
 
   const handleCategoryChange = (index: number) => {
-    const categories: GalleryCategory[] = ["facility", "team", "events"];
+    const categories: Category[] = ["facility", "team", "events"];
     setCurrentCategory(categories[index]);
-    // Reset loading state when changing categories
-    setIsLoading(true);
   };
 
   // Handle image loading errors
@@ -277,10 +211,9 @@ export default function GalleryPage() {
               {Object.values(galleryData).map((images, idx) => (
                 <Tab.Panel key={idx} className="focus:outline-none">
                   {isLoading ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {[...Array(6)].map((_, i) => (
-                        <div key={i} className="bg-gray-200 animate-pulse h-72 rounded-lg"></div>
-                      ))}
+                    <div className="flex flex-col items-center justify-center py-20">
+                      <Loader className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+                      <p className="text-gray-500">Loading gallery images...</p>
                     </div>
                   ) : loadingError ? (
                     <div className="text-center py-12">
@@ -289,11 +222,28 @@ export default function GalleryPage() {
                         onClick={() => {
                           setIsLoading(true);
                           setLoadingError(null);
+                          fetchCategoryImages(currentCategory)
+                            .then(images => {
+                              setGalleryData(prev => ({
+                                ...prev,
+                                [currentCategory]: images
+                              }));
+                              setIsLoading(false);
+                            })
+                            .catch(err => {
+                              console.error("Error reloading images:", err);
+                              setLoadingError("Failed to reload images.");
+                              setIsLoading(false);
+                            });
                         }}
                         className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                       >
                         Try Again
                       </button>
+                    </div>
+                  ) : images.length === 0 ? (
+                    <div className="text-center py-12">
+                      <p className="text-gray-500">No images found in this category.</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
