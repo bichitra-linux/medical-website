@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import Head from 'next/head';
-import AdminLayout from '@/components/layout/admin-layout';
-import { Save, X, AlertCircle, Globe, User, Bell } from 'lucide-react';
+import { useState, useEffect } from "react";
+import Head from "next/head";
+import AdminLayout from "@/components/layout/admin-layout";
+import { Save, X, AlertCircle, Globe, User, Bell } from "lucide-react";
 
 // Types for settings
 type SiteSettings = {
@@ -31,10 +31,12 @@ type NotificationSettings = {
 export default function SettingsPage() {
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings | null>(null);
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState('site');
+  const [activeTab, setActiveTab] = useState("site");
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -43,36 +45,36 @@ export default function SettingsPage() {
     const loadSettings = async () => {
       try {
         // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         // Mock data
         setSiteSettings({
-          siteName: 'Medical Center',
-          contactEmail: 'contact@medicalcenter.com',
-          phoneNumber: '(555) 123-4567',
-          address: '123 Healthcare Ave, Medical City, MC 12345',
+          siteName: "Medical Center",
+          contactEmail: "contact@medicalcenter.com",
+          phoneNumber: "(555) 123-4567",
+          address: "123 Healthcare Ave, Medical City, MC 12345",
           socialLinks: {
-            facebook: 'https://facebook.com/medicalcenter',
-            twitter: 'https://twitter.com/medicalcenter',
-            instagram: 'https://instagram.com/medicalcenter'
-          }
+            facebook: "https://facebook.com/medicalcenter",
+            twitter: "https://twitter.com/medicalcenter",
+            instagram: "https://instagram.com/medicalcenter",
+          },
         });
-        
+
         setUserSettings({
-          name: 'Admin User',
-          email: 'admin@medicalcenter.com',
-          role: 'Administrator'
+          name: "Admin User",
+          email: "admin@medicalcenter.com",
+          role: "Administrator",
         });
-        
+
         setNotificationSettings({
           emailNotifications: true,
           appointmentReminders: true,
-          marketingEmails: false
+          marketingEmails: false,
         });
-        
+
         setIsLoading(false);
       } catch (err) {
-        setError('Failed to load settings. Please try again.');
+        setError("Failed to load settings. Please try again.");
         setIsLoading(false);
       }
     };
@@ -85,43 +87,45 @@ export default function SettingsPage() {
     setIsSaving(true);
     setError(null);
     setSuccessMessage(null);
-    
+
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 800));
-      
-      setSuccessMessage('Settings saved successfully!');
-      
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      setSuccessMessage("Settings saved successfully!");
+
       // Auto-hide success message after 3 seconds
       setTimeout(() => {
         setSuccessMessage(null);
       }, 3000);
     } catch (err) {
-      setError('Failed to save settings. Please try again.');
+      setError("Failed to save settings. Please try again.");
     } finally {
       setIsSaving(false);
     }
   };
 
   // Handle site settings changes
-  const handleSiteSettingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleSiteSettingChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
-    
-    if (name.includes('.')) {
+
+    if (name.includes(".")) {
       // Handle nested properties (like socialLinks.facebook)
-      const [parent, child] = name.split('.');
-      setSiteSettings(prev => ({
+      const [parent, child] = name.split(".");
+      setSiteSettings((prev) => ({
         ...prev,
         [parent]: {
           ...prev[parent],
-          [child]: value
-        }
+          [child]: value,
+        },
       }));
     } else {
       // Handle top-level properties
-      setSiteSettings(prev => ({
+      setSiteSettings((prev) => ({
         ...prev,
-        [name]: value
+        [name]: value,
       }));
     }
   };
@@ -129,9 +133,9 @@ export default function SettingsPage() {
   // Handle notification setting changes
   const handleNotificationSettingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setNotificationSettings(prev => ({
+    setNotificationSettings((prev) => ({
       ...prev,
-      [name]: checked
+      [name]: checked,
     }));
   };
 
@@ -140,13 +144,13 @@ export default function SettingsPage() {
       <Head>
         <title>Settings | Medical Admin</title>
       </Head>
-      
+
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Settings</h1>
+        <h1 className="text-2xl text-gray-600 font-bold">Settings</h1>
         <button
           onClick={handleSave}
           disabled={isLoading || isSaving}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md flex items-center transition-colors disabled:bg-blue-400"
+          className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-medium py-2.5 px-5 rounded-xl flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg active:shadow-sm disabled:opacity-70"
         >
           {isSaving ? (
             <>Saving...</>
@@ -158,53 +162,52 @@ export default function SettingsPage() {
           )}
         </button>
       </div>
-      
+
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-md mb-6 flex items-center">
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md flex items-start">
           <AlertCircle size={20} className="mr-2" />
           {error}
         </div>
       )}
-      
       {successMessage && (
-        <div className="bg-green-50 text-green-600 p-4 rounded-md mb-6 flex items-center">
+        <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-md flex items-start">
           <AlertCircle size={20} className="mr-2" />
           {successMessage}
         </div>
       )}
-      
+
       {/* Settings Tabs */}
-      <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
-        <div className="border-b border-gray-200">
+      <div className="bg-white rounded-xl shadow-xl border border-gray-100">
+      <div className="border-b border-gray-200">
           <nav className="flex -mb-px">
             <button
-              onClick={() => setActiveTab('site')}
+              onClick={() => setActiveTab("site")}
               className={`py-4 px-6 text-sm font-medium border-b-2 ${
-                activeTab === 'site'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                activeTab === "site"
+                  ? "border-indigo-500 text-indigo-600" // Changed from blue-500/600
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
               <Globe size={16} className="inline mr-2" />
               Site Settings
             </button>
             <button
-              onClick={() => setActiveTab('user')}
+              onClick={() => setActiveTab("user")}
               className={`py-4 px-6 text-sm font-medium border-b-2 ${
-                activeTab === 'user'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                activeTab === "user"
+                  ? "border-indigo-500 text-indigo-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
               <User size={16} className="inline mr-2" />
               Account
             </button>
             <button
-              onClick={() => setActiveTab('notifications')}
+              onClick={() => setActiveTab("notifications")}
               className={`py-4 px-6 text-sm font-medium border-b-2 ${
-                activeTab === 'notifications'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                activeTab === "notifications"
+                  ? "border-indigo-500 text-indigo-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
               <Bell size={16} className="inline mr-2" />
@@ -213,7 +216,7 @@ export default function SettingsPage() {
           </nav>
         </div>
       </div>
-      
+
       {isLoading ? (
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="animate-pulse p-6">
@@ -228,22 +231,20 @@ export default function SettingsPage() {
       ) : (
         <div className="bg-white rounded-lg shadow">
           {/* Site Settings */}
-          {activeTab === 'site' && siteSettings && (
+          {activeTab === "site" && siteSettings && (
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Site Name
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Site Name</label>
                   <input
                     type="text"
                     name="siteName"
                     value={siteSettings.siteName}
                     onChange={handleSiteSettingChange}
-                    className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Contact Email
@@ -253,10 +254,10 @@ export default function SettingsPage() {
                     name="contactEmail"
                     value={siteSettings.contactEmail}
                     onChange={handleSiteSettingChange}
-                    className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Phone Number
@@ -266,23 +267,21 @@ export default function SettingsPage() {
                     name="phoneNumber"
                     value={siteSettings.phoneNumber}
                     onChange={handleSiteSettingChange}
-                    className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   />
                 </div>
-                
+
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Address
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
                   <textarea
                     name="address"
                     rows={2}
                     value={siteSettings.address}
                     onChange={handleSiteSettingChange}
-                    className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Facebook URL
@@ -292,10 +291,10 @@ export default function SettingsPage() {
                     name="socialLinks.facebook"
                     value={siteSettings.socialLinks.facebook}
                     onChange={handleSiteSettingChange}
-                    className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Twitter URL
@@ -305,65 +304,56 @@ export default function SettingsPage() {
                     name="socialLinks.twitter"
                     value={siteSettings.socialLinks.twitter}
                     onChange={handleSiteSettingChange}
-                    className="w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   />
                 </div>
               </div>
             </div>
           )}
-          
+
           {/* User Settings */}
-          {activeTab === 'user' && userSettings && (
+          {activeTab === "user" && userSettings && (
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                   <input
                     type="text"
                     value={userSettings.name}
                     disabled
-                    className="w-full border-gray-300 rounded-md shadow-sm bg-gray-50"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
-                    Contact support to change your name
-                  </p>
+                  <p className="mt-1 text-xs text-gray-500">Contact support to change your name</p>
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                   <input
                     type="email"
                     value={userSettings.email}
                     disabled
-                    className="w-full border-gray-300 rounded-md shadow-sm bg-gray-50"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   />
-                  <p className="mt-1 text-xs text-gray-500">
-                    Contact support to change your email
-                  </p>
+                  <p className="mt-1 text-xs text-gray-500">Contact support to change your email</p>
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Role
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
                   <input
                     type="text"
                     value={userSettings.role}
                     disabled
-                    className="w-full border-gray-300 rounded-md shadow-sm bg-gray-50"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   />
                 </div>
-                
+
                 <div className="md:col-span-2 mt-4">
                   <div className="flex items-center justify-between bg-blue-50 p-4 rounded-md">
                     <div>
                       <h3 className="text-sm font-medium text-blue-800">Change Password</h3>
                       <p className="text-xs text-blue-600 mt-1">
-                        For security reasons, password changes are handled through a separate process
+                        For security reasons, password changes are handled through a separate
+                        process
                       </p>
                     </div>
                     <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700">
@@ -374,9 +364,9 @@ export default function SettingsPage() {
               </div>
             </div>
           )}
-          
+
           {/* Notification Settings */}
-          {activeTab === 'notifications' && notificationSettings && (
+          {activeTab === "notifications" && notificationSettings && (
             <div className="p-6">
               <div className="space-y-4">
                 <div className="flex items-start">
@@ -387,15 +377,19 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={notificationSettings.emailNotifications}
                       onChange={handleNotificationSettingChange}
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="emailNotifications" className="font-medium text-gray-700">Email Notifications</label>
-                    <p className="text-gray-500">Receive email notifications about system updates and important events</p>
+                    <label htmlFor="emailNotifications" className="font-medium text-gray-700">
+                      Email Notifications
+                    </label>
+                    <p className="text-gray-500">
+                      Receive email notifications about system updates and important events
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
                     <input
@@ -404,15 +398,17 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={notificationSettings.appointmentReminders}
                       onChange={handleNotificationSettingChange}
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="appointmentReminders" className="font-medium text-gray-700">Appointment Reminders</label>
+                    <label htmlFor="appointmentReminders" className="font-medium text-gray-700">
+                      Appointment Reminders
+                    </label>
                     <p className="text-gray-500">Receive reminders about upcoming appointments</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start">
                   <div className="flex items-center h-5">
                     <input
@@ -421,11 +417,13 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={notificationSettings.marketingEmails}
                       onChange={handleNotificationSettingChange}
-                      className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300 rounded"
+                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="marketingEmails" className="font-medium text-gray-700">Marketing Emails</label>
+                    <label htmlFor="marketingEmails" className="font-medium text-gray-700">
+                      Marketing Emails
+                    </label>
                     <p className="text-gray-500">Receive promotional emails and newsletters</p>
                   </div>
                 </div>

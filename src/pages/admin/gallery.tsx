@@ -313,7 +313,7 @@ export default function GalleryPage() {
                   id="category-filter"
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value as CategoryFilter)}
-                  className="appearance-none pl-10 pr-10 py-2.5 bg-gray-50 border border-gray-200 text-gray-700 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 focus:outline-none min-w-[180px]"
+                  className="appearance-none pl-10 pr-9 py-2.5 w-full border border-gray-200 bg-white/50 text-gray-600 backdrop-blur-sm rounded-xl shadow-sm hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 transition-all duration-200"
                 >
                   <option value="all">All Categories</option>
                   <option value="facility">Facility</option>
@@ -331,7 +331,7 @@ export default function GalleryPage() {
             <button
               onClick={handleFileSelect}
               disabled={isUploading || showImageForm}
-              className="flex items-center px-4 py-2.5 text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-lg font-medium shadow-sm transition-all disabled:opacity-60 disabled:pointer-events-none text-sm"
+              className="flex items-center px-4 py-2.5 text-white bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 rounded-lg font-medium shadow-sm transition-all disabled:opacity-60 disabled:pointer-events-none text-sm"
             >
               {isUploading ? (
                 <div className="flex items-center">
@@ -366,22 +366,10 @@ export default function GalleryPage() {
             </button>
           </div>
         </div>
-
-        <div className="flex items-center text-sm">
-          <span className="text-blue-600 font-medium">Dashboard</span>
-          <span className="mx-2 text-gray-400">/</span>
-          <span className="text-gray-500 font-medium">Gallery</span>
-          {selectedCategory !== "all" && (
-            <>
-              <span className="mx-2 text-gray-400">/</span>
-              <span className="text-gray-800 font-medium capitalize">{selectedCategory}</span>
-            </>
-          )}
-        </div>
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-md mb-6 flex items-center">
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md flex items-start">
           <X size={20} className="mr-2" />
           {error}
         </div>
@@ -443,7 +431,7 @@ export default function GalleryPage() {
                   type="text"
                   value={newImage.title}
                   onChange={(e) => setNewImage({ ...newImage, title: e.target.value })}
-                  className="w-full border-gray-300 rounded-lg shadow-sm py-2.5 px-3 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-500"
+                  className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   placeholder="Image title (optional)"
                 />
               </div>
@@ -453,7 +441,7 @@ export default function GalleryPage() {
                   type="text"
                   value={newImage.alt}
                   onChange={(e) => setNewImage({ ...newImage, alt: e.target.value })}
-                  className="w-full border-gray-300 rounded-lg shadow-sm py-2.5 px-3 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-gray-500"
+                  className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   placeholder="Image description (optional)"
                 />
                 <p className="text-xs text-gray-500 mt-1.5">For accessibility</p>
@@ -467,7 +455,7 @@ export default function GalleryPage() {
                       console.log("Category selected:", e.target.value);
                       setNewImage({ ...newImage, category: e.target.value as Category });
                     }}
-                    className="w-full border-gray-300 rounded-lg shadow-sm py-2.5 px-3 appearance-none bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all pr-10 text-gray-500"
+                    className="appearance-none pl-10 pr-9 py-2.5 w-full border border-gray-200 bg-white/50 text-gray-600 backdrop-blur-sm rounded-xl shadow-sm hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 transition-all duration-200"
                     required
                   >
                     <option value="facility">Facility</option>

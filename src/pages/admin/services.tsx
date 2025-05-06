@@ -451,7 +451,7 @@ export default function ServicesPage() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value as any)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm min-w-[180px]"
+              className="appearance-none pl-10 pr-9 py-2.5 w-full border border-gray-200 bg-white/50 text-gray-600 backdrop-blur-sm rounded-xl shadow-sm hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 transition-all duration-200"
               aria-label="Filter by category"
             >
               <option value="all">All Categories</option>
@@ -466,7 +466,7 @@ export default function ServicesPage() {
           </div>
           <button
             onClick={handleAddService}
-            className="flex items-center px-4 py-2.5 text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-lg font-medium shadow-sm transition-all disabled:opacity-60 disabled:pointer-events-none text-sm"
+            className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-medium py-2.5 px-5 rounded-xl flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg active:shadow-sm disabled:opacity-70"
           >
             <Plus size={18} className="mr-1" />
             Add Service
@@ -475,14 +475,14 @@ export default function ServicesPage() {
       </div>
 
       {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-md mb-6 flex items-center">
+        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md flex items-start">
           <X size={20} className="mr-2" />
           {error}
         </div>
       )}
 
       {success && (
-        <div className="bg-green-50 text-green-600 p-4 rounded-md mb-6 flex items-center">
+        <div className="bg-green-50 border-l-4 text-gray-600 border-green-500 p-4 rounded-md flex items-start">
           <Check size={20} className="mr-2" />
           {success}
         </div>
@@ -531,7 +531,7 @@ export default function ServicesPage() {
                     name="name"
                     value={serviceForm.name}
                     onChange={handleInputChange}
-                    className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                     required
                   />
                 </div>
@@ -552,7 +552,7 @@ export default function ServicesPage() {
                       name="category"
                       value={serviceForm.category}
                       onChange={handleInputChange}
-                      className="pl-9 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
+                      className="appearance-none pl-10 pr-9 py-2.5 w-full border border-gray-200 bg-white/50 text-gray-600 backdrop-blur-sm rounded-xl shadow-sm hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 transition-all duration-200"
                       required
                     >
                       <option value="diagnostic">Diagnostic</option>
@@ -576,7 +576,7 @@ export default function ServicesPage() {
                     name="shortDescription"
                     value={serviceForm.shortDescription}
                     onChange={handleInputChange}
-                    className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                     required
                     maxLength={100}
                   />
@@ -602,7 +602,7 @@ export default function ServicesPage() {
                       onChange={handleInputChange}
                       step="0.01"
                       min="0"
-                      className="pl-9 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="pl-19 w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                       required
                     />
                   </div>
@@ -625,7 +625,7 @@ export default function ServicesPage() {
                       name="duration"
                       value={serviceForm.duration}
                       onChange={handleInputChange}
-                      className="pl-9 w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                      className="pl-19 w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                       placeholder="e.g. 30 min, 1 hour"
                     />
                   </div>
@@ -649,7 +649,7 @@ export default function ServicesPage() {
                   value={serviceForm.description}
                   onChange={handleInputChange}
                   rows={5}
-                  className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                   required
                 ></textarea>
               </div>
@@ -673,7 +673,7 @@ export default function ServicesPage() {
                     name="image"
                     value={serviceForm.image}
                     onChange={handleInputChange}
-                    className="w-full border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
                     placeholder="/images/services/service-name.jpg"
                   />
                   <p className="text-xs text-gray-500 mt-1">Path to the service image (optional)</p>
@@ -710,7 +710,7 @@ export default function ServicesPage() {
                         type="checkbox"
                         checked={serviceForm.isPopular}
                         onChange={handleInputChange}
-                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors"
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       />
                     </div>
                     <div className="ml-3 text-sm">
@@ -731,7 +731,7 @@ export default function ServicesPage() {
                         type="checkbox"
                         checked={serviceForm.isActive}
                         onChange={handleInputChange}
-                        className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded transition-colors"
+                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                       />
                     </div>
                     <div className="ml-3 text-sm">
@@ -751,14 +751,14 @@ export default function ServicesPage() {
                 type="button"
                 onClick={() => setShowServiceForm(false)}
                 disabled={isSaving}
-                className="px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors shadow-sm"
+                className="px-5 py-2.5 border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-5 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all shadow-sm disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center min-w-[100px]"
+                className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-medium py-2.5 px-5 rounded-xl flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg active:shadow-sm disabled:opacity-70"
               >
                 {isSaving ? (
                   <>
@@ -814,14 +814,14 @@ export default function ServicesPage() {
           <p className="text-gray-500 mb-4">No services found in this category</p>
           <button
             onClick={handleAddService}
-            className="text-blue-600 hover:text-blue-800 font-medium"
+            className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-medium py-2.5 px-5 rounded-xl flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg active:shadow-sm disabled:opacity-70"
           >
             Add your first service
           </button>
         </div>
       ) : (
         // Services table
-        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+        <div className="bg-white rounded-xl shadow-xl border border-gray-100">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
