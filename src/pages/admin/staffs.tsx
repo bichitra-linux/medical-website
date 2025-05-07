@@ -22,8 +22,41 @@ import {
 import { debounce } from "lodash";
 
 // Define types
-type StaffRole = "doctor" | "nurse" | "admin" | "technician" | "reception";
-
+type StaffRole =
+  | "select_role"
+  // Executive/Management
+  | "managing_director"
+  | "finance_director"
+  | "store_manager"
+  // Medical Doctors & Specialists
+  | "general_physician"
+  | "pathologist"
+  | "dermatologist"
+  | "anesthetist"
+  | "radiologist"
+  | "cardiologist"
+  | "psychiatrist"
+  | "orthopedic"
+  | "Orthodontics"
+  // Allied Health Professionals
+  | "physiotherapist"
+  | "pharmacist"
+  | "nurse"
+  // Laboratory & Technical Staff
+  | "lab_staff"
+  | "bmlt"
+  | "cmlt"
+  | "cma"
+  | "s_ha"
+  | "technician"
+  | "radiographer"
+  // Administrative & Support
+  | "admin"
+  | "documentation"
+  | "reporting_officer"
+  | "reception"
+  | "marketing"
+  | "cleaner";
 interface Staff {
   id: string;
   name: string;
@@ -77,7 +110,7 @@ export default function StaffsPage() {
   // Form state
   const [staffForm, setStaffForm] = useState<StaffFormData>({
     name: "",
-    role: "doctor",
+    role: "select_role",
     specialization: "",
     qualifications: "",
     nmcNumber: "", // Add this field
@@ -112,10 +145,10 @@ export default function StaffsPage() {
         {
           id: "1",
           name: "Dr. Arun Kumar",
-          role: "doctor",
-          specialization: "Cardiology",
+          role: "cardiologist", // Changed from "doctor" to specific role
+          specialization: "Interventional Cardiology",
           qualifications: "MBBS, MD Cardiology",
-          nmcNumber: "NMC123456", // Add this field
+          nmcNumber: "NMC123456",
           experience: "10 years",
           bio: "Dr. Kumar is a specialist in cardiovascular diseases with extensive experience in interventional cardiology.",
           contactEmail: "arun.kumar@medical.com",
@@ -131,7 +164,7 @@ export default function StaffsPage() {
           role: "nurse",
           qualifications: "BSc Nursing",
           specialization: "Critical Care",
-          nmcNumber: "NMC654321", // Add this field
+          nmcNumber: "NMC654321",
           experience: "5 years",
           bio: "Sita is an experienced nurse specializing in critical care and emergency medicine.",
           contactEmail: "sita.sharma@medical.com",
@@ -143,10 +176,10 @@ export default function StaffsPage() {
         {
           id: "3",
           name: "Ram Shrestha",
-          role: "admin",
+          role: "admin", // This is valid in StaffRole
           qualifications: "MBA Healthcare Management",
           specialization: "Operations Management",
-          nmcNumber: "NMC789012", // Add this field
+          nmcNumber: "NMC789012",
           experience: "8 years",
           bio: "Ram handles administrative operations and ensures the smooth functioning of the medical center.",
           contactEmail: "ram.shrestha@medical.com",
@@ -159,10 +192,10 @@ export default function StaffsPage() {
         {
           id: "4",
           name: "Anita Thapa",
-          role: "technician",
+          role: "technician", // This is valid in StaffRole
           qualifications: "Diploma in Medical Laboratory Technology",
           specialization: "Radiology",
-          nmcNumber: "NMC345678", // Add this field
+          nmcNumber: "NMC345678",
           experience: "4 years",
           bio: "Anita is skilled in operating various diagnostic equipment and conducting laboratory tests.",
           contactEmail: "anita.thapa@medical.com",
@@ -299,7 +332,7 @@ export default function StaffsPage() {
     setEditingStaff(null);
     setStaffForm({
       name: "",
-      role: "doctor",
+      role: "select_role",
       specialization: "",
       qualifications: "",
       nmcNumber: "", // Add this field
@@ -330,6 +363,20 @@ export default function StaffsPage() {
       image: staff.image || "",
     });
     setShowStaffForm(true);
+  };
+
+  const isDoctorRole = (role: StaffRole): boolean => {
+    return [
+      "general_physician",
+      "pathologist",
+      "dermatologist",
+      "anesthetist",
+      "radiologist",
+      "cardiologist",
+      "psychiatrist",
+      "orthopedic",
+      "Orthodontics",
+    ].includes(role);
   };
 
   // Handle form submission (create or update staff)
@@ -364,6 +411,12 @@ export default function StaffsPage() {
       return;
     }
 
+    // NMC validation only for doctor roles
+    if (isDoctorRole(staffForm.role) && !staffForm.nmcNumber.trim()) {
+      setError("NMC number is required for doctors");
+      return;
+    }
+
     try {
       setIsSaving(true);
       setError(null);
@@ -377,8 +430,9 @@ export default function StaffsPage() {
           ...editingStaff,
           name: staffForm.name,
           role: staffForm.role,
-          specialization: staffForm.role === "doctor" ? staffForm.specialization : undefined,
+          specialization: isDoctorRole(staffForm.role) ? staffForm.specialization : undefined,
           qualifications: staffForm.qualifications,
+          nmcNumber: isDoctorRole(staffForm.role) ? staffForm.nmcNumber : "", // Only include for doctors
           experience: staffForm.experience,
           bio: staffForm.bio,
           contactEmail: staffForm.contactEmail,
@@ -400,9 +454,9 @@ export default function StaffsPage() {
           id: Date.now().toString(), // In real app, this would come from the server
           name: staffForm.name,
           role: staffForm.role,
-          specialization: staffForm.role === "doctor" ? staffForm.specialization : undefined,
+          specialization: isDoctorRole(staffForm.role) ? staffForm.specialization : undefined,
           qualifications: staffForm.qualifications,
-          nmcNumber: staffForm.nmcNumber, // Add this field
+          nmcNumber: isDoctorRole(staffForm.role) ? staffForm.nmcNumber : "", // Only include for doctors
           experience: staffForm.experience,
           bio: staffForm.bio,
           contactEmail: staffForm.contactEmail,
@@ -503,14 +557,49 @@ export default function StaffsPage() {
   // Get display text for role
   const getRoleDisplayText = (role: StaffRole): string => {
     const roleMap: Record<StaffRole, string> = {
-      doctor: "Doctor",
+      // Default placeholder
+      select_role: "Select Role",
+
+      // Executive/Management
+      managing_director: "Managing Director",
+      finance_director: "Finance Director",
+      store_manager: "Store Manager",
+
+      // Medical Doctors & Specialists
+      general_physician: "General Physician",
+      pathologist: "Pathologist",
+      dermatologist: "Dermatologist",
+      anesthetist: "Anesthetist",
+      radiologist: "Radiologist",
+      cardiologist: "Cardiologist",
+      psychiatrist: "Psychiatrist",
+      orthopedic: "Orthopedic Specialist",
+      Orthodontics: "Orthodontist",
+
+      // Allied Health Professionals
+      physiotherapist: "Physiotherapist",
+      pharmacist: "Pharmacist",
       nurse: "Nurse",
-      admin: "Administrative Staff",
+
+      // Laboratory & Technical Staff
+      lab_staff: "Laboratory Staff",
+      bmlt: "BMLT",
+      cmlt: "CMLT",
+      cma: "CMA",
+      s_ha: "S.Ha",
       technician: "Technician",
+      radiographer: "Radiographer",
+
+      // Administrative & Support
+      admin: "Administrative Staff",
+      documentation: "Documentation Officer",
+      reporting_officer: "Reporting Officer",
       reception: "Receptionist",
+      marketing: "Marketing Executive",
+      cleaner: "Cleaner",
     };
 
-    return roleMap[role] || role;
+    return roleMap[role] || role.replace(/_/g, " ");
   };
 
   return (
@@ -534,11 +623,49 @@ export default function StaffsPage() {
                 aria-label="Filter by role"
               >
                 <option value="all">All Staff</option>
-                <option value="doctor">Doctors</option>
-                <option value="nurse">Nurses</option>
-                <option value="admin">Administrative</option>
-                <option value="technician">Technicians</option>
-                <option value="reception">Reception</option>
+
+                <optgroup label="Executive/Management">
+                  <option value="managing_director">Managing Director</option>
+                  <option value="finance_director">Finance Director</option>
+                  <option value="store_manager">Store Manager</option>
+                </optgroup>
+
+                <optgroup label="Medical Doctors & Specialists">
+                  <option value="general_physician">General Physician</option>
+                  <option value="pathologist">Pathologist</option>
+                  <option value="dermatologist">Dermatologist</option>
+                  <option value="anesthetist">Anesthetist</option>
+                  <option value="radiologist">Radiologist</option>
+                  <option value="cardiologist">Cardiologist</option>
+                  <option value="psychiatrist">Psychiatrist</option>
+                  <option value="orthopedic">Orthopedic</option>
+                  <option value="Orthodontics">Orthodontics</option>
+                </optgroup>
+
+                <optgroup label="Allied Health Professionals">
+                  <option value="physiotherapist">Physiotherapist</option>
+                  <option value="pharmacist">Pharmacist</option>
+                  <option value="nurse">Nurse</option>
+                </optgroup>
+
+                <optgroup label="Laboratory & Technical Staff">
+                  <option value="lab_staff">Laboratory Staff</option>
+                  <option value="bmlt">BMLT</option>
+                  <option value="cmlt">CMLT</option>
+                  <option value="cma">CMA</option>
+                  <option value="s_ha">S.Ha</option>
+                  <option value="technician">Technician</option>
+                  <option value="radiographer">Radiographer</option>
+                </optgroup>
+
+                <optgroup label="Administrative & Support">
+                  <option value="admin">Administrative</option>
+                  <option value="documentation">Documentation</option>
+                  <option value="reporting_officer">Reporting Officer</option>
+                  <option value="reception">Reception</option>
+                  <option value="marketing">Marketing</option>
+                  <option value="cleaner">Cleaner</option>
+                </optgroup>
               </select>
               <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                 <Filter size={16} className="text-indigo-600/70" />
@@ -746,7 +873,7 @@ export default function StaffsPage() {
                         {staff.qualifications}
                       </p>
 
-                      {staff.nmcNumber && (
+                      {staff.nmcNumber && isDoctorRole(staff.role) && (
                         <p className="text-sm flex items-center text-gray-600">
                           <Award size={14} className="mr-1.5 text-gray-400" />
                           NMC: {staff.nmcNumber}
@@ -854,11 +981,52 @@ export default function StaffsPage() {
                       className="w-full pl-10 p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600 appearance-none"
                       required
                     >
-                      <option value="doctor">Doctor</option>
-                      <option value="nurse">Nurse</option>
-                      <option value="admin">Administrative Staff</option>
-                      <option value="technician">Technician</option>
-                      <option value="reception">Receptionist</option>
+                      <option value="select_role" disabled>
+                        Select Role
+                      </option>
+
+                      <optgroup label="Executive/Management">
+                        <option value="managing_director">Managing Director</option>
+                        <option value="finance_director">Finance Director</option>
+                        <option value="store_manager">Store Manager</option>
+                      </optgroup>
+
+                      <optgroup label="Medical Doctors & Specialists">
+                        <option value="general_physician">General Physician</option>
+                        <option value="pathologist">Pathologist</option>
+                        <option value="dermatologist">Dermatologist</option>
+                        <option value="anesthetist">Anesthetist</option>
+                        <option value="radiologist">Radiologist</option>
+                        <option value="cardiologist">Cardiologist</option>
+                        <option value="psychiatrist">Psychiatrist</option>
+                        <option value="orthopedic">Orthopedic</option>
+                        <option value="Orthodontics">Orthodontics</option>
+                      </optgroup>
+
+                      <optgroup label="Allied Health Professionals">
+                        <option value="physiotherapist">Physiotherapist</option>
+                        <option value="pharmacist">Pharmacist</option>
+                        <option value="nurse">Nurse</option>
+                      </optgroup>
+
+                      <optgroup label="Laboratory & Technical Staff">
+                        <option value="lab_staff">Laboratory Staff</option>
+                        <option value="bmlt">BMLT</option>
+                        <option value="cmlt">CMLT</option>
+                        <option value="cma">CMA</option>
+                        <option value="s_ha">S.Ha</option>
+                        <option value="technician">Technician</option>
+                        <option value="radiographer">Radiographer</option>
+                      </optgroup>
+
+                      <optgroup label="Administrative & Support">
+                        <option value="admin">Administrative Staff</option>
+                        <option value="documentation">Documentation Officer</option>
+                        <option value="reporting_officer">Reporting Officer</option>
+                        <option value="reception">Receptionist</option>
+                        <option value="marketing">Marketing Executive</option>
+                        <option value="cleaner">Cleaner</option>
+                      </optgroup>
                     </select>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                       <svg
@@ -882,7 +1050,15 @@ export default function StaffsPage() {
                 </div>
 
                 {/* Specialization (only for doctors) */}
-                {staffForm.role === "doctor" && (
+                {(staffForm.role === "general_physician" ||
+                  staffForm.role === "pathologist" ||
+                  staffForm.role === "dermatologist" ||
+                  staffForm.role === "anesthetist" ||
+                  staffForm.role === "radiologist" ||
+                  staffForm.role === "cardiologist" ||
+                  staffForm.role === "psychiatrist" ||
+                  staffForm.role === "orthopedic" ||
+                  staffForm.role === "Orthodontics") && (
                   <div>
                     <label
                       htmlFor="specialization"
@@ -903,7 +1079,25 @@ export default function StaffsPage() {
                 )}
 
                 {/* Qualifications */}
-                <div className={staffForm.role === "doctor" ? "" : "md:col-span-2"}>
+                <div
+                  className={
+                    // Change from a check for "doctor" to a check for any medical specialist role
+                    [
+                      "general_physician",
+                      "pathologist",
+                      "dermatologist",
+                      "anesthetist",
+                      "radiologist",
+                      "cardiologist",
+                      "psychiatrist",
+                      "orthopedic",
+                      "Orthodontics",
+                    ].includes(staffForm.role)
+                      ? ""
+                      : "md:col-span-2"
+                  }
+                >
+                  {" "}
                   <label
                     htmlFor="qualifications"
                     className="block text-sm font-medium text-gray-600 mb-1"
@@ -922,24 +1116,26 @@ export default function StaffsPage() {
                   />
                 </div>
                 {/* Nepal Medical Council Number - NEW FIELD */}
-                <div>
-                  <label
-                    htmlFor="nmcNumber"
-                    className="block text-sm font-medium text-gray-600 mb-1"
-                  >
-                    Nepal Medical Council No. <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="nmcNumber"
-                    name="nmcNumber"
-                    type="text"
-                    value={staffForm.nmcNumber}
-                    onChange={handleInputChange}
-                    placeholder="e.g. 12345-A"
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600 placeholder-gray-400"
-                    required
-                  />
-                </div>
+                {isDoctorRole(staffForm.role) && (
+                  <div>
+                    <label
+                      htmlFor="nmcNumber"
+                      className="block text-sm font-medium text-gray-600 mb-1"
+                    >
+                      Nepal Medical Council No. <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="nmcNumber"
+                      name="nmcNumber"
+                      type="text"
+                      value={staffForm.nmcNumber}
+                      onChange={handleInputChange}
+                      placeholder="e.g. 12345-A"
+                      className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600 placeholder-gray-400"
+                      required
+                    />
+                  </div>
+                )}
 
                 {/* Experience */}
                 <div>
