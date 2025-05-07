@@ -1,14 +1,33 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
-import AdminLayout from "@/components/layout/admin-layout";
-import { Plus, Edit, Trash, Check, X, Filter, Clock, DollarSign, Tag } from "lucide-react";
+import { Plus, Edit, Trash, Check, X, Filter, Clock, Tag } from "lucide-react";
+import { db } from "@/pages/api/firebase/firebase";
+import {
+  collection,
+  doc,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  serverTimestamp,
+  Timestamp,
+} from "firebase/firestore";
+import { useAuth } from "@/hooks/useAuth";
 
 // Define types that align with the user-facing services page
-type ServiceCategory = "diagnostic" | "consultation" | "specialist" | "laboratory";
+type ServiceCategory =
+  | "diagnostic"
+  | "consultation"
+  | "specialist"
+  | "laboratory"
+  | "foreign_medical";
 
 // Complete service type with all necessary fields
 type Service = {
-  id: number;
+  id: string;
   name: string;
   description: string;
   shortDescription: string;
@@ -18,8 +37,8 @@ type Service = {
   isPopular: boolean;
   isActive: boolean;
   image?: string; // Optional image path
-  createdAt: string;
-  updatedAt: string;
+  createdAt: Timestamp | null;
+  updatedAt: Timestamp | null;
 };
 
 // Type definition for services data structure
@@ -27,10 +46,23 @@ type ServicesData = {
   [key in ServiceCategory]: Service[];
 };
 
+// Define a reference to the Firestore services collection
+const servicesCollectionRef = collection(db, "services");
+
 // Option 1: Define the props interface for NPRSymbol
 interface NPRSymbolProps {
   size?: number;
   className?: string;
+}
+
+function isServiceCategory(category: string): category is ServiceCategory {
+  return [
+    "diagnostic",
+    "consultation",
+    "specialist",
+    "laboratory",
+    "foreign_medical",
+  ].includes(category);
 }
 
 export default function ServicesPage() {
@@ -39,6 +71,7 @@ export default function ServicesPage() {
     consultation: [],
     specialist: [],
     laboratory: [],
+    foreign_medical: [],
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,7 +91,6 @@ export default function ServicesPage() {
     duration: string;
     isPopular: boolean;
     isActive: boolean;
-    image: string;
   }>({
     name: "",
     description: "",
@@ -68,129 +100,51 @@ export default function ServicesPage() {
     duration: "30 min",
     isPopular: false,
     isActive: true,
-    image: "",
   });
 
+  // Format Firestore timestamp for display
+  const formatDate = (timestamp: Timestamp | null): string => {
+    if (!timestamp) return "N/A";
+    return timestamp.toDate().toLocaleDateString();
+  };
   // Load services data on component mount
   useEffect(() => {
     const loadServices = async () => {
       try {
         setIsLoading(true);
-        // In a real implementation, this would be an API call to fetch services
-
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Mock data that follows the structure needed by the user view
-        const mockServicesData: ServicesData = {
-          diagnostic: [
-            {
-              id: 1,
-              name: "General Health Checkup",
-              description:
-                "Comprehensive health assessment including blood work, vital signs, and consultation with a physician.",
-              shortDescription: "Complete physical examination and consultation",
-              price: 150.0,
-              category: "diagnostic",
-              duration: "1 hour",
-              isPopular: true,
-              isActive: true,
-              image: "/images/services/health-checkup.jpg",
-              createdAt: "2023-01-15",
-              updatedAt: "2023-04-10",
-            },
-            {
-              id: 2,
-              name: "X-Ray Imaging",
-              description:
-                "Digital X-ray imaging services for diagnosis of bone fractures, joint issues, and chest conditions.",
-              shortDescription: "Digital X-ray for bone and chest diagnosis",
-              price: 200.0,
-              category: "diagnostic",
-              duration: "30 min",
-              isPopular: true,
-              isActive: true,
-              image: "/images/services/xray.jpg",
-              createdAt: "2023-01-18",
-              updatedAt: "2023-04-10",
-            },
-          ],
-          consultation: [
-            {
-              id: 3,
-              name: "Primary Care Consultation",
-              description:
-                "One-on-one consultation with a primary care physician for general health concerns and preventive care.",
-              shortDescription: "Meet with a primary care doctor",
-              price: 100.0,
-              category: "consultation",
-              duration: "45 min",
-              isPopular: true,
-              isActive: true,
-              image: "/images/services/primary-care.jpg",
-              createdAt: "2023-01-20",
-              updatedAt: "2023-03-05",
-            },
-          ],
-          specialist: [
-            {
-              id: 4,
-              name: "Cardiology Consultation",
-              description:
-                "Consultation with a cardiologist for heart-related concerns, including ECG and heart health assessment.",
-              shortDescription: "Heart health assessment with specialist",
-              price: 250.0,
-              category: "specialist",
-              duration: "1 hour",
-              isPopular: false,
-              isActive: true,
-              image: "/images/services/cardiology.jpg",
-              createdAt: "2023-02-01",
-              updatedAt: "2023-02-01",
-            },
-          ],
-          laboratory: [
-            {
-              id: 5,
-              name: "Complete Blood Count",
-              description:
-                "Comprehensive blood test that evaluates overall health and detects various disorders including anemia, infection, and leukemia.",
-              shortDescription: "Comprehensive blood analysis",
-              price: 80.0,
-              category: "laboratory",
-              duration: "15 min",
-              isPopular: true,
-              isActive: true,
-              image: "/images/services/blood-test.jpg",
-              createdAt: "2023-02-10",
-              updatedAt: "2023-03-15",
-            },
-            {
-              id: 6,
-              name: "Lipid Profile",
-              description:
-                "Blood test that measures lipids—fats and fatty substances used as a source of energy by your body.",
-              shortDescription: "Cholesterol and triglycerides test",
-              price: 60.0,
-              category: "laboratory",
-              duration: "15 min",
-              isPopular: false,
-              isActive: true,
-              image: "/images/services/lipid-test.jpg",
-              createdAt: "2023-02-15",
-              updatedAt: "2023-02-15",
-            },
-          ],
+        const querySnapshot = await getDocs(servicesCollectionRef);
+        const loadedServices: ServicesData = {
+          diagnostic: [],
+          consultation: [],
+          specialist: [],
+          laboratory: [],
+          foreign_medical: [],
         };
-
-        setServicesData(mockServicesData);
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const service: Service = {
+            id: doc.id,
+            name: data.name,
+            description: data.description,
+            shortDescription: data.shortDescription,
+            price: data.price,
+            category: data.category as ServiceCategory,
+            duration: data.duration,
+            isPopular: data.isPopular,
+            isActive: data.isActive,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+          };
+          loadedServices[service.category].push(service);
+        });
+        setServicesData(loadedServices);
         setIsLoading(false);
       } catch (err) {
+        console.error("Error loading services:", err);
         setError("Failed to load services. Please try again.");
         setIsLoading(false);
       }
     };
-
     loadServices();
   }, []);
 
@@ -201,13 +155,17 @@ export default function ServicesPage() {
       ...servicesData.consultation,
       ...servicesData.specialist,
       ...servicesData.laboratory,
+      ...servicesData.foreign_medical,
     ];
   };
 
   // Filter services by category
   const filteredServices =
-    selectedCategory === "all" ? getAllServices() : servicesData[selectedCategory];
-
+  selectedCategory === "all"
+    ? getAllServices()
+    : isServiceCategory(selectedCategory)
+    ? servicesData[selectedCategory]
+    : [];
   // Open form to add a new service
   const handleAddService = () => {
     setEditingService(null);
@@ -220,7 +178,6 @@ export default function ServicesPage() {
       duration: "30 min",
       isPopular: false,
       isActive: true,
-      image: "",
     });
     setShowServiceForm(true);
   };
@@ -237,7 +194,6 @@ export default function ServicesPage() {
       duration: service.duration,
       isPopular: service.isPopular,
       isActive: service.isActive,
-      image: service.image || "",
     });
     setShowServiceForm(true);
   };
@@ -268,154 +224,152 @@ export default function ServicesPage() {
     }
   };
 
+  // --- API CALL HELPERS ---
+  async function apiCall(method: "POST" | "PUT" | "DELETE", body: any) {
+    const res = await fetch("/api/admin/services", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.error || "API error");
+    }
+    return await res.json();
+  }
+
   // Handle form submission (create or update)
   const handleServiceSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setIsSaving(true);
     setError(null);
     setSuccess(null);
 
     try {
-      // Validate form
-      if (!serviceForm.name.trim()) {
-        throw new Error("Service name is required");
-      }
+      if (!serviceForm.name.trim()) throw new Error("Service name is required");
+      if (!serviceForm.description.trim()) throw new Error("Service description is required");
+      if (!serviceForm.shortDescription.trim()) throw new Error("Short description is required");
+      if (serviceForm.price <= 0) throw new Error("Price must be greater than zero");
 
-      if (!serviceForm.description.trim()) {
-        throw new Error("Service description is required");
+      // Handle popular service logic (same as before)
+      if (serviceForm.isPopular) {
+        const existingPopularService = getAllServices().find(
+          (service) => service.isPopular && (!editingService || service.id !== editingService.id)
+        );
+        if (existingPopularService) {
+          const confirmChange = confirm(
+            `"${existingPopularService.name}" is already marked as popular. Only one service can be popular at a time. Do you want to make "${serviceForm.name}" the popular service instead?`
+          );
+          if (!confirmChange) {
+            setServiceForm((prev) => ({
+              ...prev,
+              isPopular: false,
+            }));
+            setIsSaving(false);
+            return;
+          } else {
+            // Unpopularize the existing popular service via API
+            await apiCall("PUT", {
+              id: existingPopularService.id,
+              isPopular: false,
+            });
+            setServicesData((prev) => {
+              const updated = { ...prev };
+              updated[existingPopularService.category] = updated[
+                existingPopularService.category
+              ].map((service) =>
+                service.id === existingPopularService.id
+                  ? { ...service, isPopular: false }
+                  : service
+              );
+              return updated;
+            });
+          }
+        }
       }
-
-      if (!serviceForm.shortDescription.trim()) {
-        throw new Error("Short description is required");
-      }
-
-      if (serviceForm.price <= 0) {
-        throw new Error("Price must be greater than zero");
-      }
-
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
 
       if (editingService) {
-        // Update existing service
-        const updatedService: Service = {
-          ...editingService,
+        // Update existing service via API
+        const updated = await apiCall("PUT", {
+          id: editingService.id,
           ...serviceForm,
-          updatedAt: new Date().toISOString().split("T")[0],
-        };
-
-        // Update state by replacing the service in the specific category
-        setServicesData((prev) => ({
-          ...prev,
-          [updatedService.category]: prev[updatedService.category].map((service) =>
-            service.id === updatedService.id ? updatedService : service
-          ),
-        }));
-
-        setSuccess(`Service "${updatedService.name}" updated successfully!`);
+        });
+        setServicesData((prev) => {
+          const newState = { ...prev };
+          // Remove from old category if changed
+          if (editingService.category !== updated.category) {
+            newState[editingService.category] = newState[editingService.category].filter(
+              (s) => s.id !== editingService.id
+            );
+          } else {
+            newState[updated.category] = newState[updated.category].filter(
+              (s: { id: any; }) => s.id !== updated.id
+            );
+          }
+          newState[updated.category] = [...newState[updated.category], updated];
+          return newState;
+        });
+        setSuccess(`Service "${updated.name}" updated successfully!`);
       } else {
-        // Create new service
-        const newService: Service = {
-          id: Math.floor(Math.random() * 10000), // In real app, this would come from the backend
-          ...serviceForm,
-          createdAt: new Date().toISOString().split("T")[0],
-          updatedAt: new Date().toISOString().split("T")[0],
-        };
-
-        // Add to the correct category in the services data
+        // Create new service via API
+        const created = await apiCall("POST", serviceForm);
         setServicesData((prev) => ({
           ...prev,
-          [newService.category]: [...prev[newService.category], newService],
+          [created.category]: [...prev[created.category], created],
         }));
-
-        setSuccess(`Service "${newService.name}" created successfully!`);
+        setSuccess(`Service "${created.name}" created successfully!`);
       }
-
-      // Close form after successful submission
       setShowServiceForm(false);
       setEditingService(null);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Failed to save service. Please try again.");
-      }
+      setError(err instanceof Error ? err.message : "Failed to save service.");
     } finally {
       setIsSaving(false);
     }
   };
 
   // Handle toggling service active status
-  const handleToggleStatus = async (id: number, category: ServiceCategory) => {
+  const handleToggleStatus = async (id: string, category: ServiceCategory) => {
     try {
-      // Find the service
       const serviceToUpdate = servicesData[category].find((service) => service.id === id);
-
-      if (!serviceToUpdate) {
-        throw new Error("Service not found");
-      }
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 300));
-
-      // Toggle the status
-      const updatedService: Service = {
-        ...serviceToUpdate,
+      if (!serviceToUpdate) throw new Error("Service not found");
+      const updated = await apiCall("PUT", {
+        id,
         isActive: !serviceToUpdate.isActive,
-        updatedAt: new Date().toISOString().split("T")[0],
-      };
-
-      // Update state
+      });
       setServicesData((prev) => ({
         ...prev,
-        [category]: prev[category].map((service) => (service.id === id ? updatedService : service)),
+        [category]: prev[category].map((service) =>
+          service.id === id ? { ...service, isActive: updated.isActive, updatedAt: updated.updatedAt } : service
+        ),
       }));
-
       setSuccess(
-        `Service "${updatedService.name}" ${
-          updatedService.isActive ? "activated" : "deactivated"
+        `Service "${serviceToUpdate.name}" ${
+          updated.isActive ? "activated" : "deactivated"
         } successfully!`
       );
-
-      // Auto-hide success message after 3 seconds
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Failed to update service status. Please try again.");
-      }
-      // Auto-hide error message after 3 seconds
+      setError(err instanceof Error ? err.message : "Failed to update service status.");
       setTimeout(() => setError(null), 3000);
     }
   };
 
   // Handle deleting a service
-  const handleDeleteService = async (id: number, category: ServiceCategory) => {
+  const handleDeleteService = async (id: string, category: ServiceCategory) => {
     if (confirm("Are you sure you want to delete this service? This action cannot be undone.")) {
       try {
-        // Simulate API call for deletion
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        // Get service name before deletion for success message
         const serviceName =
           servicesData[category].find((service) => service.id === id)?.name || "Service";
-
-        // Update state by removing the service from the specific category
+        await apiCall("DELETE", { id });
         setServicesData((prev) => ({
           ...prev,
           [category]: prev[category].filter((service) => service.id !== id),
         }));
-
         setSuccess(`Service "${serviceName}" deleted successfully!`);
-
-        // Auto-hide success message after 3 seconds
         setTimeout(() => setSuccess(null), 3000);
       } catch (err) {
-        setError("Failed to delete service. Please try again.");
-
-        // Auto-hide error message after 3 seconds
+        setError(err instanceof Error ? err.message : "Failed to delete service.");
         setTimeout(() => setError(null), 3000);
       }
     }
@@ -459,6 +413,7 @@ export default function ServicesPage() {
               <option value="consultation">Consultation</option>
               <option value="specialist">Specialist</option>
               <option value="laboratory">Laboratory</option>
+              <option value="foreign_medical">Foreign Medical</option>
             </select>
             <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
               <Filter size={16} className="text-gray-400" />
@@ -559,6 +514,7 @@ export default function ServicesPage() {
                       <option value="consultation">Consultation</option>
                       <option value="specialist">Specialist</option>
                       <option value="laboratory">Laboratory</option>
+                      <option value="foreign_medical">Foreign Medical</option>
                     </select>
                   </div>
                 </div>
@@ -657,47 +613,6 @@ export default function ServicesPage() {
 
             {/* Image and Settings Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
-              {/* Image Upload */}
-              <div>
-                <h3 className="text-md font-medium text-gray-700 mb-4">Service Image</h3>
-                <div>
-                  <label
-                    htmlFor="image-url"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Image URL
-                  </label>
-                  <input
-                    id="image-url"
-                    type="text"
-                    name="image"
-                    value={serviceForm.image}
-                    onChange={handleInputChange}
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
-                    placeholder="/images/services/service-name.jpg"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Path to the service image (optional)</p>
-                </div>
-
-                {serviceForm.image && (
-                  <div className="mt-4">
-                    <p className="text-sm font-medium text-gray-700 mb-2">Image Preview:</p>
-                    <div className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50 shadow-sm w-full h-48 relative">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={serviceForm.image}
-                        alt="Service preview"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="%233b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Crect x="3" y="3" width="18" height="18" rx="2" ry="2"/%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"/%3E%3Cpolyline points="21 15 16 10 5 21"/%3E%3C/svg%3E';
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-
               {/* Service Options */}
               <div>
                 <h3 className="text-md font-medium text-gray-700 mb-4">Service Options</h3>
@@ -718,7 +633,7 @@ export default function ServicesPage() {
                         Mark as popular service
                       </label>
                       <p className="text-gray-500">
-                        Popular services will be highlighted on the website
+                        Only one service can be marked as popular at a time
                       </p>
                     </div>
                   </div>
@@ -848,44 +763,32 @@ export default function ServicesPage() {
                   <tr
                     key={service.id}
                     className={`transition-colors hover:bg-gray-50/50 ${
-                      !service.isActive ? "bg-gray-50/70" : "bg-white"
+                      !service.isActive
+                        ? "bg-gray-50/70"
+                        : service.isPopular
+                        ? "bg-yellow-50/30"
+                        : "bg-white"
                     }`}
                   >
                     <td className="px-6 py-5">
-                      <div className="flex items-center">
-                        {service.image && (
-                          <div className="flex-shrink-0 h-12 w-12 mr-4">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              className="h-12 w-12 rounded-md object-cover ring-1 ring-gray-200"
-                              src={service.image}
-                              alt={service.name}
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).src =
-                                  'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="%233b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%3E%3Crect x="3" y="3" width="18" height="18" rx="2" ry="2"/%3E%3Ccircle cx="8.5" cy="8.5" r="1.5"/%3E%3Cpolyline points="21 15 16 10 5 21"/%3E%3C/svg%3E';
-                              }}
-                            />
-                          </div>
-                        )}
-                        <div>
-                          <div className="text-sm font-medium text-gray-900 flex flex-wrap items-center gap-2 mb-1">
-                            <span className="truncate max-w-[200px]">{service.name}</span>
-                            {service.isPopular && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
-                                Popular
-                              </span>
-                            )}
-                          </div>
-                          <div className="text-sm text-gray-500 truncate max-w-xs">
-                            {service.shortDescription}
-                          </div>
-                          {service.duration && (
-                            <div className="text-xs text-gray-500 flex items-center mt-1.5">
-                              <Clock size={12} className="mr-1.5 text-gray-400" />
-                              {service.duration}
-                            </div>
+                      <div>
+                        <div className="text-sm font-medium text-gray-900 flex flex-wrap items-center gap-2 mb-1">
+                          <span className="truncate max-w-[200px]">{service.name}</span>
+                          {service.isPopular && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">
+                              Popular
+                            </span>
                           )}
                         </div>
+                        <div className="text-sm text-gray-500 truncate max-w-xs">
+                          {service.shortDescription}
+                        </div>
+                        {service.duration && (
+                          <div className="text-xs text-gray-500 flex items-center mt-1.5">
+                            <Clock size={12} className="mr-1.5 text-gray-400" />
+                            {service.duration}
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="px-6 py-5 whitespace-nowrap">
