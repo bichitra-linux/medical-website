@@ -5,12 +5,14 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/router";
 import contactData from "@/lib/contact.json"; // Adjust the import path as necessary
 import { usePathname } from "next/navigation";
+import { useAppointmentsSwitch } from "@/context/AppointmentSwitchContext"; // Adjust the import path as necessary
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { appointmentsEnabled } = useAppointmentsSwitch();
 
   
   const isAdmin = pathname.startsWith('/admin') || pathname.startsWith('/dashboard') || pathname.startsWith('/auth') || pathname.startsWith('/login') || pathname.startsWith('/register');
@@ -100,12 +102,14 @@ const Header = () => {
                 {contactData.phone.contacts.find((c) => c.label === "Contact")?.value}
               </a>
             </div>
+            {appointmentsEnabled && (
             <Link
               href="/appointment"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition duration-300 shadow-sm hover:shadow"
             >
               Book Appointment
             </Link>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -171,12 +175,14 @@ const Header = () => {
               <p className="text-gray-600 text-sm">
                 Emergency: <span className="text-blue-600 font-bold">+1 (123) 456-7890</span>
               </p>
+              {appointmentsEnabled && (
               <Link
                 href="/appointment"
                 className="block mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium text-center transition duration-300 shadow-sm hover:shadow"
               >
                 Book Appointment
               </Link>
+              )}
             </div>
           </nav>
         </div>

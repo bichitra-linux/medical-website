@@ -4,6 +4,7 @@ import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import Layout from "@/components/layout/layout";
 import AdminLayout from "@/components/layout/admin-layout";
+import { AppointmentsSwitchProvider } from "@/context/AppointmentSwitchContext";
 
 const useLayout = (Component: any) => {
   const router = useRouter();
@@ -33,8 +34,11 @@ export default function App({ Component, pageProps }: AppProps) {
     <ClerkProvider 
       {...pageProps}
       navigateUrl={router.pathname === "/admin/login" ? "/admin/dashboard" : undefined}
-    >
+    > 
+      <AppointmentsSwitchProvider>
+        {/* Use the layout function to wrap the component */}
       {getLayout(<Component {...pageProps} />)}
+      </AppointmentsSwitchProvider>
     </ClerkProvider>
   );
 }

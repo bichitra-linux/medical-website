@@ -8,6 +8,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import * as z from "zod";
 import teamData from "@/lib/team.json";
 import { toast } from "sonner";
+import { useAppointmentsSwitch } from "@/context/AppointmentSwitchContext";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -30,11 +31,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -89,6 +86,7 @@ export default function AppointmentPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const [availableTimeSlots, setAvailableTimeSlots] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { appointmentsEnabled, isLoading: isLoadingSwitch } = useAppointmentsSwitch();
 
   // Initialize form with react-hook-form
   const form = useForm<AppointmentFormValues>({
@@ -118,10 +116,19 @@ export default function AppointmentPage() {
 
     // Sample time slots - in a real app, this would come from your backend
     const slots = [
-      "9:00 AM", "9:30 AM", "10:00 AM", "10:30 AM",
-      "11:00 AM", "11:30 AM", "1:00 PM", "1:30 PM",
-      "2:00 PM", "2:30 PM", "3:00 PM", "3:30 PM",
-      "4:00 PM"
+      "9:00 AM",
+      "9:30 AM",
+      "10:00 AM",
+      "10:30 AM",
+      "11:00 AM",
+      "11:30 AM",
+      "1:00 PM",
+      "1:30 PM",
+      "2:00 PM",
+      "2:30 PM",
+      "3:00 PM",
+      "3:30 PM",
+      "4:00 PM",
     ];
 
     // Randomly remove some slots to simulate availability
@@ -143,23 +150,24 @@ export default function AppointmentPage() {
   // Form submission handler
   const onSubmit: SubmitHandler<AppointmentFormValues> = (values) => {
     setIsSubmitting(true);
-    
+
     // Use Promise-based approach
     Promise.resolve()
-      .then(() => new Promise(resolve => setTimeout(resolve, 1500)))
+      .then(() => new Promise((resolve) => setTimeout(resolve, 1500)))
       .then(() => {
         // For demonstration - in a real app, you'd send this to your backend
         console.log("Form values:", values);
-        
+
         // Show success toast
         toast("Appointment Requested", {
-          description: "We've received your appointment request and will contact you shortly to confirm.",
+          description:
+            "We've received your appointment request and will contact you shortly to confirm.",
         });
-        
+
         // Redirect to confirmation page
         router.push("/appointment/confirmation");
       })
-      .catch(error => {
+      .catch((error) => {
         console.error("Error submitting form:", error);
         toast("Something went wrong", {
           description: "There was a problem submitting your appointment request. Please try again.",
@@ -170,6 +178,49 @@ export default function AppointmentPage() {
         setIsSubmitting(false);
       });
   };
+
+  if (isLoadingSwitch) {
+    return (
+      <>
+        <Head>
+          <title>Loading Appointments | Purna Chandra Diagnostic Center</title>
+        </Head>
+        <section className="py-20 text-center">
+          <h1 className="text-3xl font-bold mb-4">Loading...</h1>
+          <p className="text-gray-600">Please wait while we check appointment availability.</p>
+        </section>
+      </>
+    );
+  }
+
+  if (!appointmentsEnabled) {
+    return (
+      <>
+        <Head>
+          <title>Appointments Unavailable | Purna Chandra Diagnostic Center</title>
+        </Head>
+        <section className="bg-gradient-to-r from-blue-50 to-blue-100 py-16 md:py-20">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto text-center">
+              <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                Appointments Temporarily Unavailable
+              </h1>
+              <p className="text-lg text-gray-600 mb-8">
+                We are currently not accepting new appointment requests online. Please check back
+                later or contact our office directly for assistance.
+              </p>
+              <Link
+                href="/"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition duration-300 shadow-sm hover:shadow"
+              >
+                Go to Homepage
+              </Link>
+            </div>
+          </div>
+        </section>
+      </>
+    );
+  }
 
   return (
     <>
@@ -192,7 +243,8 @@ export default function AppointmentPage() {
               Schedule an Appointment
             </h1>
             <p className="text-lg text-gray-600 mb-8">
-              Book your visit with our healthcare professionals. We're here to provide you with exceptional care.
+              Book your visit with our healthcare professionals. We're here to provide you with
+              exceptional care.
             </p>
           </div>
         </div>
@@ -208,7 +260,8 @@ export default function AppointmentPage() {
                 <CardHeader className="bg-blue-50 border-b border-blue-100">
                   <CardTitle className="text-2xl text-blue-800">Request Your Appointment</CardTitle>
                   <CardDescription>
-                    Fill out the form below to request an appointment. Required fields are marked with an asterisk (*).
+                    Fill out the form below to request an appointment. Required fields are marked
+                    with an asterisk (*).
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="pt-6">
@@ -254,7 +307,11 @@ export default function AppointmentPage() {
                               <FormItem>
                                 <FormLabel>Email *</FormLabel>
                                 <FormControl>
-                                  <Input placeholder="your.email@example.com" type="email" {...field} />
+                                  <Input
+                                    placeholder="your.email@example.com"
+                                    type="email"
+                                    {...field}
+                                  />
                                 </FormControl>
                                 <FormDescription>
                                   We'll send confirmation details to this email address.
@@ -300,7 +357,8 @@ export default function AppointmentPage() {
                                 <SelectContent>
                                   {doctors.map((doctor) => (
                                     <SelectItem key={doctor.id} value={doctor.id}>
-                                      Dr. {doctor.name} {doctor.specialty ? `- ${doctor.specialty}` : ""}
+                                      Dr. {doctor.name}{" "}
+                                      {doctor.specialty ? `- ${doctor.specialty}` : ""}
                                     </SelectItem>
                                   ))}
                                 </SelectContent>
@@ -437,7 +495,9 @@ export default function AppointmentPage() {
                                     <FormControl>
                                       <RadioGroupItem value="followup" />
                                     </FormControl>
-                                    <FormLabel className="font-normal">Follow-up / Existing Patient</FormLabel>
+                                    <FormLabel className="font-normal">
+                                      Follow-up / Existing Patient
+                                    </FormLabel>
                                   </FormItem>
                                 </RadioGroup>
                               </FormControl>
@@ -445,7 +505,7 @@ export default function AppointmentPage() {
                             </FormItem>
                           )}
                         />
-                        
+
                         <FormField
                           control={form.control}
                           name="reason"
@@ -460,7 +520,8 @@ export default function AppointmentPage() {
                                 />
                               </FormControl>
                               <FormDescription>
-                                This helps us prepare for your appointment. Please include any symptoms or concerns.
+                                This helps us prepare for your appointment. Please include any
+                                symptoms or concerns.
                               </FormDescription>
                               <FormMessage />
                             </FormItem>
@@ -471,30 +532,26 @@ export default function AppointmentPage() {
                       {/* Terms and Conditions */}
                       <div className="space-y-4 pt-4 border-t border-gray-200">
                         <h3 className="text-lg font-medium text-gray-900">Terms & Conditions</h3>
-                        
+
                         <div className="bg-blue-50 rounded-md p-4 text-sm text-blue-800 mb-4">
                           <p>
-                            By scheduling an appointment, you understand that this is a request only. 
-                            Our staff will contact you to confirm the availability of your selected date and time.
-                            A 24-hour cancellation notice is required to avoid a potential cancellation fee.
+                            By scheduling an appointment, you understand that this is a request
+                            only. Our staff will contact you to confirm the availability of your
+                            selected date and time. A 24-hour cancellation notice is required to
+                            avoid a potential cancellation fee.
                           </p>
                         </div>
-                        
+
                         <FormField
                           control={form.control}
                           name="termsAccepted"
                           render={({ field }) => (
                             <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                               <FormControl>
-                                <Checkbox
-                                  checked={field.value}
-                                  onCheckedChange={field.onChange}
-                                />
+                                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
                               </FormControl>
                               <div className="space-y-1 leading-none">
-                                <FormLabel>
-                                  I agree to the terms and conditions *
-                                </FormLabel>
+                                <FormLabel>I agree to the terms and conditions *</FormLabel>
                                 <FormDescription>
                                   By checking this box, you agree to our{" "}
                                   <Link href="/terms" className="text-blue-600 hover:underline">
@@ -514,21 +571,14 @@ export default function AppointmentPage() {
                       </div>
 
                       {/* Submit Button */}
-                      <Button 
-                        type="submit" 
-                        className="w-full" 
-                        size="lg"
-                        disabled={isSubmitting}
-                      >
+                      <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
                         {isSubmitting ? "Processing..." : "Request Appointment"}
                       </Button>
                     </form>
                   </Form>
                 </CardContent>
                 <CardFooter className="bg-gray-50 border-t border-gray-100 text-sm text-gray-500">
-                  <p>
-                    Need help? Call us at (555) 123-4567 during our office hours.
-                  </p>
+                  <p>Need help? Call us at (555) 123-4567 during our office hours.</p>
                 </CardFooter>
               </Card>
             </div>
@@ -582,7 +632,8 @@ export default function AppointmentPage() {
                     <div>
                       <h4 className="font-medium mb-1">Cancellation Policy</h4>
                       <p className="text-gray-600 text-sm">
-                        Please provide at least 24 hours notice if you need to cancel or reschedule your appointment.
+                        Please provide at least 24 hours notice if you need to cancel or reschedule
+                        your appointment.
                       </p>
                     </div>
 
