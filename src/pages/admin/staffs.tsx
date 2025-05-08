@@ -136,81 +136,14 @@ export default function StaffsPage() {
   const fetchStaffData = async () => {
     try {
       setIsLoading(true);
-
-      // In a real app, you would fetch data from your API
-      // For demo purposes, we'll use mock data
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      const mockStaffData: Staff[] = [
-        {
-          id: "1",
-          name: "Dr. Arun Kumar",
-          role: "cardiologist", // Changed from "doctor" to specific role
-          specialization: "Interventional Cardiology",
-          qualifications: "MBBS, MD Cardiology",
-          nmcNumber: "NMC123456",
-          experience: "10 years",
-          bio: "Dr. Kumar is a specialist in cardiovascular diseases with extensive experience in interventional cardiology.",
-          contactEmail: "arun.kumar@medical.com",
-          contactPhone: "977-01-4521345",
-          isActive: true,
-          image: "/images/staff/doctor1.jpg",
-          joinDate: "2020-05-15",
-          updatedAt: "2023-02-10",
-        },
-        {
-          id: "2",
-          name: "Sita Sharma",
-          role: "nurse",
-          qualifications: "BSc Nursing",
-          specialization: "Critical Care",
-          nmcNumber: "NMC654321",
-          experience: "5 years",
-          bio: "Sita is an experienced nurse specializing in critical care and emergency medicine.",
-          contactEmail: "sita.sharma@medical.com",
-          contactPhone: "977-01-4521346",
-          isActive: true,
-          joinDate: "2021-03-10",
-          updatedAt: "2023-01-05",
-        },
-        {
-          id: "3",
-          name: "Ram Shrestha",
-          role: "admin", // This is valid in StaffRole
-          qualifications: "MBA Healthcare Management",
-          specialization: "Operations Management",
-          nmcNumber: "NMC789012",
-          experience: "8 years",
-          bio: "Ram handles administrative operations and ensures the smooth functioning of the medical center.",
-          contactEmail: "ram.shrestha@medical.com",
-          contactPhone: "977-01-4521347",
-          isActive: true,
-          image: "/images/staff/admin1.jpg",
-          joinDate: "2019-11-20",
-          updatedAt: "2022-12-15",
-        },
-        {
-          id: "4",
-          name: "Anita Thapa",
-          role: "technician", // This is valid in StaffRole
-          qualifications: "Diploma in Medical Laboratory Technology",
-          specialization: "Radiology",
-          nmcNumber: "NMC345678",
-          experience: "4 years",
-          bio: "Anita is skilled in operating various diagnostic equipment and conducting laboratory tests.",
-          contactEmail: "anita.thapa@medical.com",
-          isActive: false,
-          joinDate: "2021-06-05",
-          updatedAt: "2023-01-20",
-        },
-      ];
-
-      setStaffList(mockStaffData);
-      setFilteredStaff(mockStaffData);
-      setIsLoading(false);
+      const res = await fetch("/api/admin/staffs");
+      if (!res.ok) throw new Error("Failed to load staff");
+      const { staffs } = (await res.json()) as { staffs: Staff[] };
+      setStaffList(staffs);
+      setFilteredStaff(staffs);
     } catch (err) {
-      console.error("Failed to fetch staff data:", err);
-      setError("Failed to load staff data. Please try again.");
+      setError((err as Error).message || "Failed to load staff.");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -268,62 +201,32 @@ export default function StaffsPage() {
   };
 
   // Handle image upload
+  // Upload image to Cloudinary, store only URL
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate file type
-    const validTypes = ["image/jpeg", "image/png", "image/webp"];
-    if (!validTypes.includes(file.type)) {
-      setError("Please select a valid image file (JPEG, PNG, or WebP)");
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      setError("Image must be less than 2MB");
-      return;
-    }
-
     try {
       setIsUploading(true);
       setError(null);
 
-      // Simulate upload progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) => {
-          if (prev >= 90) {
-            clearInterval(progressInterval);
-            return 90;
-          }
-          return prev + 10;
-        });
-      }, 200);
+      const form = new FormData();
+      form.append("file", file);
 
-      // In a real app, you'd upload to your backend or cloud storage
-      // For demo, we'll simulate a delay and use a local URL
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      // call the new staffs/upload handler
+      const uploadRes = await fetch("/api/cloudinary/staffs/upload", {
+        method: "POST",
+        body: form,
+      });
+      if (!uploadRes.ok) throw new Error("Upload failed");
 
-      clearInterval(progressInterval);
-      setUploadProgress(100);
-
-      // Create a local URL for the image (in a real app, this would be the URL from your server)
-      const imageUrl = URL.createObjectURL(file);
-
-      setStaffForm((prev) => ({
-        ...prev,
-        image: imageUrl,
-      }));
-
-      // Reset progress after a short delay
-      setTimeout(() => {
-        setUploadProgress(0);
-      }, 1000);
+      const { url } = (await uploadRes.json()) as { url: string };
+      // store only the secure URL
+      setStaffForm((prev) => ({ ...prev, image: url }));
     } catch (err) {
-      console.error("Image upload failed:", err);
-      setError("Failed to upload image. Please try again.");
+      setError((err as Error).message || "Image upload failed");
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -421,68 +324,35 @@ export default function StaffsPage() {
       setIsSaving(true);
       setError(null);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      // If user just selected a new file, upload happened above.
+      // Now send entire payload—including the Cloudinary URL—to your admin API
+      const payload = editingStaff ? { id: editingStaff.id, ...staffForm } : { ...staffForm };
 
-      if (editingStaff) {
-        // Update existing staff
-        const updatedStaff: Staff = {
-          ...editingStaff,
-          name: staffForm.name,
-          role: staffForm.role,
-          specialization: isDoctorRole(staffForm.role) ? staffForm.specialization : undefined,
-          qualifications: staffForm.qualifications,
-          nmcNumber: isDoctorRole(staffForm.role) ? staffForm.nmcNumber : "", // Only include for doctors
-          experience: staffForm.experience,
-          bio: staffForm.bio,
-          contactEmail: staffForm.contactEmail,
-          contactPhone: staffForm.contactPhone || undefined,
-          isActive: staffForm.isActive,
-          image: staffForm.image || undefined,
-          updatedAt: new Date().toISOString().split("T")[0],
-        };
-
-        // Update staff in list
-        setStaffList((prev) =>
-          prev.map((staff) => (staff.id === updatedStaff.id ? updatedStaff : staff))
-        );
-
-        setSuccess(`${updatedStaff.name} has been updated successfully`);
-      } else {
-        // Create new staff
-        const newStaff: Staff = {
-          id: Date.now().toString(), // In real app, this would come from the server
-          name: staffForm.name,
-          role: staffForm.role,
-          specialization: isDoctorRole(staffForm.role) ? staffForm.specialization : undefined,
-          qualifications: staffForm.qualifications,
-          nmcNumber: isDoctorRole(staffForm.role) ? staffForm.nmcNumber : "", // Only include for doctors
-          experience: staffForm.experience,
-          bio: staffForm.bio,
-          contactEmail: staffForm.contactEmail,
-          contactPhone: staffForm.contactPhone || undefined,
-          isActive: staffForm.isActive,
-          image: staffForm.image || undefined,
-          joinDate: new Date().toISOString().split("T")[0],
-          updatedAt: new Date().toISOString().split("T")[0],
-        };
-
-        // Add new staff to list
-        setStaffList((prev) => [...prev, newStaff]);
-
-        setSuccess(`${newStaff.name} has been added successfully`);
+      const res = await fetch("/api/admin/staffs", {
+        method: editingStaff ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Save failed");
       }
 
-      // Close form after successful submission
-      setShowStaffForm(false);
+      const saved = (await res.json()) as Staff;
+      if (editingStaff) {
+        setStaffList((list) => list.map((s) => (s.id === saved.id ? saved : s)));
+      } else {
+        setStaffList((list) => [...list, saved]);
+      }
+      filterStaff();
 
-      // Auto-hide success message after a few seconds
-      setTimeout(() => {
-        setSuccess(null);
-      }, 5000);
+      setSuccess(
+        editingStaff ? `${saved.name} updated successfully` : `${saved.name} added successfully`
+      );
+      setShowStaffForm(false);
+      setEditingStaff(null);
     } catch (err) {
-      console.error("Failed to save staff:", err);
-      setError("Failed to save staff. Please try again.");
+      setError((err as Error).message || "Failed to save staff");
     } finally {
       setIsSaving(false);
     }

@@ -1,20 +1,6 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import { Plus, Edit, Trash, Check, X, Filter, Clock, Tag } from "lucide-react";
-import { db } from "@/pages/api/firebase/firebase";
-import {
-  collection,
-  doc,
-  getDocs,
-  getDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  query,
-  where,
-  serverTimestamp,
-  Timestamp,
-} from "firebase/firestore";
 import { useAuth } from "@/hooks/useAuth";
 
 // Define types that align with the user-facing services page
@@ -33,12 +19,12 @@ type Service = {
   shortDescription: string;
   price: number;
   category: ServiceCategory;
-  duration: string; // e.g., "30 min", "1 hour"
+  duration: string;
   isPopular: boolean;
   isActive: boolean;
-  image?: string; // Optional image path
-  createdAt: Timestamp | null;
-  updatedAt: Timestamp | null;
+  image?: string;
+  createdAt: any; // now comes as ISO string or null from API
+  updatedAt: any;
 };
 
 // Type definition for services data structure
@@ -46,23 +32,16 @@ type ServicesData = {
   [key in ServiceCategory]: Service[];
 };
 
-// Define a reference to the Firestore services collection
-const servicesCollectionRef = collection(db, "services");
-
-// Option 1: Define the props interface for NPRSymbol
+// Define the props interface for NPRSymbol
 interface NPRSymbolProps {
   size?: number;
   className?: string;
 }
 
 function isServiceCategory(category: string): category is ServiceCategory {
-  return [
-    "diagnostic",
-    "consultation",
-    "specialist",
-    "laboratory",
-    "foreign_medical",
-  ].includes(category);
+  return ["diagnostic", "consultation", "specialist", "laboratory", "foreign_medical"].includes(
+    category
+  );
 }
 
 export default function ServicesPage() {
@@ -103,16 +82,30 @@ export default function ServicesPage() {
   });
 
   // Format Firestore timestamp for display
-  const formatDate = (timestamp: Timestamp | null): string => {
+  const formatDate = (timestamp: any): string => {
     if (!timestamp) return "N/A";
-    return timestamp.toDate().toLocaleDateString();
+    try {
+      // Try to parse as Firestore Timestamp or ISO string
+      if (typeof timestamp === "string") {
+        return new Date(timestamp).toLocaleDateString();
+      }
+      if (timestamp.toDate) {
+        return timestamp.toDate().toLocaleDateString();
+      }
+      return "N/A";
+    } catch {
+      return "N/A";
+    }
   };
   // Load services data on component mount
   useEffect(() => {
     const loadServices = async () => {
       try {
         setIsLoading(true);
-        const querySnapshot = await getDocs(servicesCollectionRef);
+        const res = await fetch("/api/admin/services");
+        if (!res.ok) throw new Error("Failed to load services");
+        const data = (await res.json()) as { services: Service[] };
+        // data.services is an array, group by category
         const loadedServices: ServicesData = {
           diagnostic: [],
           consultation: [],
@@ -120,27 +113,14 @@ export default function ServicesPage() {
           laboratory: [],
           foreign_medical: [],
         };
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const service: Service = {
-            id: doc.id,
-            name: data.name,
-            description: data.description,
-            shortDescription: data.shortDescription,
-            price: data.price,
-            category: data.category as ServiceCategory,
-            duration: data.duration,
-            isPopular: data.isPopular,
-            isActive: data.isActive,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
-          };
-          loadedServices[service.category].push(service);
-        });
+        for (const service of data.services) {
+          if (isServiceCategory(service.category)) {
+            loadedServices[service.category].push(service);
+          }
+        }
         setServicesData(loadedServices);
         setIsLoading(false);
       } catch (err) {
-        console.error("Error loading services:", err);
         setError("Failed to load services. Please try again.");
         setIsLoading(false);
       }
@@ -161,11 +141,20 @@ export default function ServicesPage() {
 
   // Filter services by category
   const filteredServices =
-  selectedCategory === "all"
-    ? getAllServices()
-    : isServiceCategory(selectedCategory)
-    ? servicesData[selectedCategory]
-    : [];
+    selectedCategory === "all"
+      ? getAllServices()
+      : isServiceCategory(selectedCategory)
+      ? servicesData[selectedCategory]
+      : [];
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (value === "all") {
+      setSelectedCategory("all");
+    } else if (isServiceCategory(value)) {
+      setSelectedCategory(value);
+    }
+  };
   // Open form to add a new service
   const handleAddService = () => {
     setEditingService(null);
@@ -251,7 +240,7 @@ export default function ServicesPage() {
       if (!serviceForm.shortDescription.trim()) throw new Error("Short description is required");
       if (serviceForm.price <= 0) throw new Error("Price must be greater than zero");
 
-      // Handle popular service logic (same as before)
+      // Handle popular service logic
       if (serviceForm.isPopular) {
         const existingPopularService = getAllServices().find(
           (service) => service.isPopular && (!editingService || service.id !== editingService.id)
@@ -275,13 +264,15 @@ export default function ServicesPage() {
             });
             setServicesData((prev) => {
               const updated = { ...prev };
-              updated[existingPopularService.category] = updated[
-                existingPopularService.category
-              ].map((service) =>
-                service.id === existingPopularService.id
-                  ? { ...service, isPopular: false }
-                  : service
-              );
+              if (isServiceCategory(existingPopularService.category)) {
+                updated[existingPopularService.category] = updated[
+                  existingPopularService.category
+                ].map((service) =>
+                  service.id === existingPopularService.id
+                    ? { ...service, isPopular: false }
+                    : service
+                );
+              }
               return updated;
             });
           }
@@ -289,35 +280,27 @@ export default function ServicesPage() {
       }
 
       if (editingService) {
-        // Update existing service via API
-        const updated = await apiCall("PUT", {
+        const updated = (await apiCall("PUT", {
           id: editingService.id,
           ...serviceForm,
-        });
+        })) as Service;
+
         setServicesData((prev) => {
           const newState = { ...prev };
-          // Remove from old category if changed
-          if (editingService.category !== updated.category) {
-            newState[editingService.category] = newState[editingService.category].filter(
-              (s) => s.id !== editingService.id
-            );
-          } else {
-            newState[updated.category] = newState[updated.category].filter(
-              (s: { id: any; }) => s.id !== updated.id
-            );
+          if (isServiceCategory(editingService.category) && isServiceCategory(updated.category)) {
+            // Safe to index now
+            // ...existing code...
           }
-          newState[updated.category] = [...newState[updated.category], updated];
           return newState;
         });
-        setSuccess(`Service "${updated.name}" updated successfully!`);
       } else {
-        // Create new service via API
-        const created = await apiCall("POST", serviceForm);
-        setServicesData((prev) => ({
-          ...prev,
-          [created.category]: [...prev[created.category], created],
-        }));
-        setSuccess(`Service "${created.name}" created successfully!`);
+        const created = (await apiCall("POST", serviceForm)) as Service;
+        if (isServiceCategory(created.category)) {
+          setServicesData((prev) => ({
+            ...prev,
+            [created.category]: [...prev[created.category], created],
+          }));
+        }
       }
       setShowServiceForm(false);
       setEditingService(null);
@@ -340,7 +323,9 @@ export default function ServicesPage() {
       setServicesData((prev) => ({
         ...prev,
         [category]: prev[category].map((service) =>
-          service.id === id ? { ...service, isActive: updated.isActive, updatedAt: updated.updatedAt } : service
+          service.id === id
+            ? { ...service, isActive: updated.isActive, updatedAt: updated.updatedAt }
+            : service
         ),
       }));
       setSuccess(
@@ -404,7 +389,7 @@ export default function ServicesPage() {
           <div className="relative">
             <select
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value as any)}
+              onChange={handleCategoryChange}
               className="appearance-none pl-10 pr-9 py-2.5 w-full border border-gray-200 bg-white/50 text-gray-600 backdrop-blur-sm rounded-xl shadow-sm hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 transition-all duration-200"
               aria-label="Filter by category"
             >
