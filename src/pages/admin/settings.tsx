@@ -1,25 +1,23 @@
 import { useState, useEffect } from "react";
 import Head from "next/head";
 import AdminLayout from "@/components/layout/admin-layout";
-import { Save, X, AlertCircle, Globe, User, Bell } from "lucide-react";
+import { Save, AlertCircle, Globe, Bell, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-// Types for settings
+// Types
 type SiteSettings = {
-  siteName: string;
-  contactEmail: string;
-  phoneNumber: string;
+  title: string;
+  logoUrl: string;
+  phoneNumbers: string[];
+  contactEmails: string[];
   address: string;
   socialLinks: {
     facebook: string;
     twitter: string;
     instagram: string;
+    linkedin: string;
+    youtube: string;
   };
-};
-
-type UserSettings = {
-  name: string;
-  email: string;
-  role: string;
 };
 
 type NotificationSettings = {
@@ -29,433 +27,369 @@ type NotificationSettings = {
 };
 
 export default function SettingsPage() {
-  const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
-  const [notificationSettings, setNotificationSettings] = 
-  useState<NotificationSettings>({
-    emailNotifications: false,
-    appointmentReminders: false,
-    marketingEmails: false
-  });
+  const [activeTab, setActiveTab] = useState<"site" | "notifications">("site");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [activeTab, setActiveTab] = useState("site");
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
-  siteName: "",
-  contactEmail: "",
-  phoneNumber: "",
-  address: "",
-  socialLinks: {
-    facebook: "",
-    twitter: "",
-    instagram: ""
-  }
-});
+    title: "",
+    logoUrl: "",
+    phoneNumbers: [""],
+    contactEmails: [""],
+    address: "",
+    socialLinks: { facebook: "", twitter: "", instagram: "", linkedin: "", youtube: "" },
+  });
+  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings>({
+    emailNotifications: false,
+    appointmentReminders: false,
+    marketingEmails: false,
+  });
 
-  // Load mock settings data
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingLogo(true);
+    const form = new FormData();
+    form.append("file", file);
+    try {
+      const res = await fetch("/api/cloudinary/settings/upload", {
+        method: "POST",
+        body: form,
+      });
+      const data = await res.json();
+      if (data.url) updateField("logoUrl", data.url);
+    } catch (err) {
+      console.error("Logo upload failed", err);
+    } finally {
+      setUploadingLogo(false);
+    }
+  };
+
   useEffect(() => {
-    const loadSettings = async () => {
-      try {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        // Mock data
-        setSiteSettings({
-          siteName: "Medical Center",
-          contactEmail: "contact@medicalcenter.com",
-          phoneNumber: "(555) 123-4567",
-          address: "123 Healthcare Ave, Medical City, MC 12345",
-          socialLinks: {
-            facebook: "https://facebook.com/medicalcenter",
-            twitter: "https://twitter.com/medicalcenter",
-            instagram: "https://instagram.com/medicalcenter",
-          },
-        });
-
-        setUserSettings({
-          name: "Admin User",
-          email: "admin@medicalcenter.com",
-          role: "Administrator",
-        });
-
-        setNotificationSettings({
-          emailNotifications: true,
-          appointmentReminders: true,
-          marketingEmails: false,
-        });
-
-        setIsLoading(false);
-      } catch (err) {
-        setError("Failed to load settings. Please try again.");
-        setIsLoading(false);
-      }
-    };
-
-    loadSettings();
+    async function load() {
+      // simulate fetch…
+      await new Promise((r) => setTimeout(r, 800));
+      setSiteSettings({
+        title: "Purna Chandra Diagnostic",
+        logoUrl: "/images/logo.png",
+        phoneNumbers: ["+977-1-4562923"],
+        contactEmails: ["purna554@gmail.com"],
+        address: "Gaushala, Kathmandu, Nepal",
+        socialLinks: {
+          facebook: "https://facebook.com/…",
+          twitter: "https://twitter.com/…",
+          instagram: "https://instagram.com/…",
+          linkedin: "https://linkedin.com/…",
+          youtube: "https://youtube.com/…",
+        },
+      });
+      setNotificationSettings({
+        emailNotifications: true,
+        appointmentReminders: true,
+        marketingEmails: false,
+      });
+      setIsLoading(false);
+    }
+    load();
   }, []);
 
-  // Handle saving settings
   const handleSave = async () => {
     setIsSaving(true);
     setError(null);
-    setSuccessMessage(null);
-
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 800));
-
-      setSuccessMessage("Settings saved successfully!");
-
-      // Auto-hide success message after 3 seconds
-      setTimeout(() => {
-        setSuccessMessage(null);
-      }, 3000);
-    } catch (err) {
-      setError("Failed to save settings. Please try again.");
+      // simulate save…
+      await new Promise((r) => setTimeout(r, 800));
+      setSuccess("Settings saved!");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch {
+      setError("Save failed");
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Handle site settings changes
-  const handleSiteSettingChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
+  // Site changes
+  const updateField = (key: keyof SiteSettings, value: any) =>
+    setSiteSettings((s) => ({ ...s, [key]: value }));
 
-    if (name.startsWith("socialLinks.")) {
-      // only ever spread the socialLinks object
-      const key = name.split(".")[1] as keyof SiteSettings["socialLinks"];
-      setSiteSettings(prev => ({
-        ...prev,
-        socialLinks: {
-          ...prev.socialLinks,
-          [key]: value
-        }
-      }));
-    } else {
-      // top‐level SiteSettings fields
-      setSiteSettings(prev => ({
-        ...prev,
-        [name as keyof SiteSettings]: value
-      }));
-    }
+  const updateSocial = (key: keyof SiteSettings["socialLinks"], value: string) =>
+    setSiteSettings((s) => ({
+      ...s,
+      socialLinks: { ...s.socialLinks, [key]: value },
+    }));
+
+  const updateArray = (arrKey: "phoneNumbers" | "contactEmails", idx: number, value: string) => {
+    setSiteSettings((s) => {
+      const arr = [...s[arrKey]];
+      arr[idx] = value;
+      return { ...s, [arrKey]: arr } as SiteSettings;
+    });
   };
 
-  // Handle notification setting changes
-  const handleNotificationSettingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const { name, checked } = e.target;
-  setNotificationSettings(prev => {
-    if (!prev) {
-      // first‐time init
-      return {
-        emailNotifications: false,
-        appointmentReminders: false,
-        marketingEmails: false,
-        [name]: checked
-      } as NotificationSettings;
-    }
-    return {
-      ...prev,
-      [name as keyof NotificationSettings]: checked
-    };
-  });
-};
+  const addArrayItem = (arrKey: "phoneNumbers" | "contactEmails") =>
+    setSiteSettings((s) => ({ ...s, [arrKey]: [...s[arrKey], ""] }));
+
+  const removeArrayItem = (arrKey: "phoneNumbers" | "contactEmails", idx: number) =>
+    setSiteSettings((s) => {
+      const arr = s[arrKey].filter((_, i) => i !== idx);
+      return { ...s, [arrKey]: arr } as SiteSettings;
+    });
+
+  // Notification changes
+  const toggleNotif = (key: keyof NotificationSettings) =>
+    setNotificationSettings((n) => ({ ...n, [key]: !n[key] }));
 
   return (
     <>
       <Head>
-        <title>Settings | Medical Admin</title>
+        <title>Settings | Admin</title>
       </Head>
-
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl text-gray-600 font-bold">Settings</h1>
-        <button
-          onClick={handleSave}
-          disabled={isLoading || isSaving}
-          className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-medium py-2.5 px-5 rounded-xl flex items-center justify-center transition-all duration-200 shadow-md hover:shadow-lg active:shadow-sm disabled:opacity-70"
-        >
-          {isSaving ? (
-            <>Saving...</>
-          ) : (
-            <>
-              <Save size={18} className="mr-1" />
-              Save Changes
-            </>
-          )}
-        </button>
-      </div>
-
-      {error && (
-        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md flex items-start">
-          <AlertCircle size={20} className="mr-2" />
-          {error}
+      <div className="container mx-auto px-4 py-8">
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-semibold text-gray-800">Settings</h1>
+          <Button
+            onClick={handleSave}
+            disabled={isLoading || isSaving}
+            className="bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800
+                       text-white font-medium py-2.5 px-5 rounded-xl flex items-center justify-center
+                       transition-all duration-200 shadow-md hover:shadow-lg active:shadow-sm disabled:opacity-70"
+          >
+            {isSaving ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                </svg>
+                Saving…
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4 mr-2" />
+                Save Settings
+              </>
+            )}
+          </Button>
         </div>
-      )}
-      {successMessage && (
-        <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-md flex items-start">
-          <AlertCircle size={20} className="mr-2" />
-          {successMessage}
-        </div>
-      )}
 
-      {/* Settings Tabs */}
-      <div className="bg-white rounded-xl shadow-xl border border-gray-100">
-      <div className="border-b border-gray-200">
-          <nav className="flex -mb-px">
-            <button
-              onClick={() => setActiveTab("site")}
-              className={`py-4 px-6 text-sm font-medium border-b-2 ${
-                activeTab === "site"
-                  ? "border-indigo-500 text-indigo-600" // Changed from blue-500/600
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              <Globe size={16} className="inline mr-2" />
-              Site Settings
-            </button>
-            <button
-              onClick={() => setActiveTab("user")}
-              className={`py-4 px-6 text-sm font-medium border-b-2 ${
-                activeTab === "user"
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              <User size={16} className="inline mr-2" />
-              Account
-            </button>
-            <button
-              onClick={() => setActiveTab("notifications")}
-              className={`py-4 px-6 text-sm font-medium border-b-2 ${
-                activeTab === "notifications"
-                  ? "border-indigo-500 text-indigo-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-              }`}
-            >
-              <Bell size={16} className="inline mr-2" />
-              Notifications
-            </button>
-          </nav>
-        </div>
-      </div>
+        {/* Tabs */}
+        <nav className="flex space-x-6 border-b border-gray-200 mb-6">
+          <button
+            onClick={() => setActiveTab("site")}
+            className={`pb-2 ${
+              activeTab === "site"
+                ? "text-indigo-600 border-b-2 border-indigo-600"
+                : "text-gray-600 hover:text-indigo-600"
+            }`}
+          >
+            <Globe className="inline-block mr-1 mb-1" />
+            Site
+          </button>
+          <button
+            onClick={() => setActiveTab("notifications")}
+            className={`pb-2 ${
+              activeTab === "notifications"
+                ? "text-indigo-600 border-b-2 border-indigo-600"
+                : "text-gray-600 hover:text-indigo-600"
+            }`}
+          >
+            <Bell className="inline-block mr-1 mb-1" />
+            Notifications
+          </button>
+        </nav>
 
-      {isLoading ? (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="animate-pulse p-6">
-            <div className="h-6 bg-gray-200 rounded mb-4 w-1/3"></div>
-            <div className="h-10 bg-gray-200 rounded mb-6"></div>
-            <div className="h-6 bg-gray-200 rounded mb-4 w-1/4"></div>
-            <div className="h-10 bg-gray-200 rounded mb-6"></div>
-            <div className="h-6 bg-gray-200 rounded mb-4 w-1/2"></div>
-            <div className="h-10 bg-gray-200 rounded"></div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-lg shadow">
-          {/* Site Settings */}
-          {activeTab === "site" && siteSettings && (
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Site Name</label>
-                  <input
-                    type="text"
-                    name="siteName"
-                    value={siteSettings.siteName}
-                    onChange={handleSiteSettingChange}
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Contact Email
-                  </label>
-                  <input
-                    type="email"
-                    name="contactEmail"
-                    value={siteSettings.contactEmail}
-                    onChange={handleSiteSettingChange}
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone Number
-                  </label>
-                  <input
-                    type="text"
-                    name="phoneNumber"
-                    value={siteSettings.phoneNumber}
-                    onChange={handleSiteSettingChange}
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                  <textarea
-                    name="address"
-                    rows={2}
-                    value={siteSettings.address}
-                    onChange={handleSiteSettingChange}
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Facebook URL
-                  </label>
-                  <input
-                    type="text"
-                    name="socialLinks.facebook"
-                    value={siteSettings.socialLinks.facebook}
-                    onChange={handleSiteSettingChange}
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Twitter URL
-                  </label>
-                  <input
-                    type="text"
-                    name="socialLinks.twitter"
-                    value={siteSettings.socialLinks.twitter}
-                    onChange={handleSiteSettingChange}
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
-                  />
-                </div>
-              </div>
+        {/* Content */}
+        {isLoading ? (
+          <div className="h-64 animate-pulse bg-white rounded-lg shadow-sm" />
+        ) : activeTab === "site" ? (
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 space-y-6">
+            {/* Site Title */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="font-medium text-gray-700">Site Title</label>
+              <input
+                value={siteSettings.title}
+                onChange={(e) => updateField("title", e.target.value)}
+                className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
+              />
             </div>
-          )}
 
-          {/* User Settings */}
-          {activeTab === "user" && userSettings && (
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                  <input
-                    type="text"
-                    value={userSettings.name}
-                    disabled
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Contact support to change your name</p>
-                </div>
+            {/* Logo URL */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label htmlFor="logo-upload" className="font-medium text-gray-700">
+                Site Logo
+              </label>
+              <div className="flex items-center space-x-4">
+                {/* Styled button to trigger file input */}
+                <label
+                  htmlFor="logo-upload"
+                  className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
+                >
+                  {siteSettings.logoUrl ? "Change Logo" : "Upload Logo"}
+                </label>
+                <input
+                  id="logo-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploadingLogo}
+                  onChange={handleLogoUpload}
+                />
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                  <input
-                    type="email"
-                    value={userSettings.email}
-                    disabled
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Contact support to change your email</p>
-                </div>
+                {/* Uploading indicator */}
+                {uploadingLogo && <span className="text-gray-500 text-sm">Uploading…</span>}
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-                  <input
-                    type="text"
-                    value={userSettings.role}
-                    disabled
-                    className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
-                  />
-                </div>
-
-                <div className="md:col-span-2 mt-4">
-                  <div className="flex items-center justify-between bg-blue-50 p-4 rounded-md">
-                    <div>
-                      <h3 className="text-sm font-medium text-blue-800">Change Password</h3>
-                      <p className="text-xs text-blue-600 mt-1">
-                        For security reasons, password changes are handled through a separate
-                        process
-                      </p>
-                    </div>
-                    <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700">
-                      Reset Password
+                {/* Preview with remove button */}
+                {!uploadingLogo && siteSettings.logoUrl && (
+                  <div className="relative inline-block">
+                    <img
+                      src={siteSettings.logoUrl}
+                      alt="Logo preview"
+                      className="h-12 w-auto rounded-lg border border-gray-200"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => updateField("logoUrl", "")}
+                      className="absolute -top-2 -right-2 bg-white rounded-full p-1 text-red-500 hover:text-red-700 shadow"
+                      aria-label="Remove logo"
+                    >
+                      <X className="h-4 w-4" />
                     </button>
                   </div>
-                </div>
+                )}
               </div>
             </div>
-          )}
 
-          {/* Notification Settings */}
-          {activeTab === "notifications" && notificationSettings && (
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="emailNotifications"
-                      name="emailNotifications"
-                      type="checkbox"
-                      checked={notificationSettings.emailNotifications}
-                      onChange={handleNotificationSettingChange}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="emailNotifications" className="font-medium text-gray-700">
-                      Email Notifications
-                    </label>
-                    <p className="text-gray-500">
-                      Receive email notifications about system updates and important events
-                    </p>
-                  </div>
+            {/* Phone Numbers */}
+            <div className="space-y-2">
+              <label className="font-medium text-gray-700">Phone Numbers</label>
+              {siteSettings.phoneNumbers.map((p, i) => (
+                <div key={i} className="flex gap-2">
+                  <input
+                    value={p}
+                    onChange={(e) => updateArray("phoneNumbers", i, e.target.value)}
+                    className="flex-1 p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
+                  />
+                  <button
+                    onClick={() => removeArrayItem("phoneNumbers", i)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
                 </div>
+              ))}
+              <button
+                onClick={() => addArrayItem("phoneNumbers")}
+                className="text-indigo-600 hover:underline"
+              >
+                + Add phone
+              </button>
+            </div>
 
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="appointmentReminders"
-                      name="appointmentReminders"
-                      type="checkbox"
-                      checked={notificationSettings.appointmentReminders}
-                      onChange={handleNotificationSettingChange}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="appointmentReminders" className="font-medium text-gray-700">
-                      Appointment Reminders
-                    </label>
-                    <p className="text-gray-500">Receive reminders about upcoming appointments</p>
-                  </div>
+            {/* Contact Emails */}
+            <div className="space-y-2">
+              <label className="font-medium text-gray-700">Contact Emails</label>
+              {siteSettings.contactEmails.map((e, i) => (
+                <div key={i} className="flex gap-2">
+                  <input
+                    value={e}
+                    onChange={(ev) => updateArray("contactEmails", i, ev.target.value)}
+                    className="flex-1 p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
+                  />
+                  <button
+                    onClick={() => removeArrayItem("contactEmails", i)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    ×
+                  </button>
                 </div>
+              ))}
+              <button
+                onClick={() => addArrayItem("contactEmails")}
+                className="text-indigo-600 hover:underline"
+              >
+                + Add email
+              </button>
+            </div>
 
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="marketingEmails"
-                      name="marketingEmails"
-                      type="checkbox"
-                      checked={notificationSettings.marketingEmails}
-                      onChange={handleNotificationSettingChange}
-                      className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                    />
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="marketingEmails" className="font-medium text-gray-700">
-                      Marketing Emails
-                    </label>
-                    <p className="text-gray-500">Receive promotional emails and newsletters</p>
-                  </div>
-                </div>
+            {/* Address */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="font-medium text-gray-700">Address</label>
+              <textarea
+                value={siteSettings.address}
+                onChange={(e) => updateField("address", e.target.value)}
+                className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
+              />
+            </div>
+
+            {/* Social Links */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="font-medium text-gray-700">Social Links</label>
+              <div className="space-y-2">
+                {(["facebook", "twitter", "instagram", "linkedin", "youtube"] as const).map(
+                  (key) => (
+                    <div key={key}>
+                      <label className="block text-sm font-medium text-gray-600 capitalize">
+                        {key}
+                      </label>
+                      <input
+                        value={siteSettings.socialLinks[key]}
+                        onChange={(e) => updateSocial(key, e.target.value)}
+                        className="w-full p-2.5 border border-gray-300 rounded-lg shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-400 text-gray-600"
+                      />
+                    </div>
+                  )
+                )}
               </div>
             </div>
-          )}
-        </div>
-      )}
+          </div>
+        ) : (
+          <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6 space-y-4">
+            {/* Notification Toggles */}
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={notificationSettings.emailNotifications}
+                onChange={() => toggleNotif("emailNotifications")}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+              />
+              <span className="text-gray-700">Email Notifications</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={notificationSettings.appointmentReminders}
+                onChange={() => toggleNotif("appointmentReminders")}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+              />
+              <span className="text-gray-700">Appointment Reminders</span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={notificationSettings.marketingEmails}
+                onChange={() => toggleNotif("marketingEmails")}
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+              />
+              <span className="text-gray-700">Marketing Emails</span>
+            </div>
+          </div>
+        )}
+      </div>
     </>
   );
 }

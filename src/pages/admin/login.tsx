@@ -84,13 +84,13 @@ export default function AdminLogin() {
               </p>
               <div className="mt-2 flex justify-center space-x-4">
                 <Link
-                  href="/privacy-policy"
+                  href="/privacy"
                   className="text-xs text-blue-600 hover:text-blue-500 hover:underline"
                 >
                   Privacy Policy
                 </Link>
                 <Link
-                  href="/terms-of-service"
+                  href="/terms"
                   className="text-xs text-blue-600 hover:text-blue-500 hover:underline"
                 >
                   Terms of Service

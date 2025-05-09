@@ -514,7 +514,7 @@ export default function ContactPage() {
                           </p>
                           <p>
                             By submitting this form, you agree to our{" "}
-                            <Link href="/privacy-policy" className="text-blue-600 hover:underline">
+                            <Link href="/privacy" className="text-blue-600 hover:underline">
                               Privacy Policy
                             </Link>{" "}
                             and consent to being contacted regarding your inquiry.
