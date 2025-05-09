@@ -73,8 +73,8 @@ const formSchema = z.object({
     required_error: "Please select a visit type",
   }),
   reason: z.string().min(10, "Please provide a brief description of your visit reason"),
-  termsAccepted: z.literal(true, {
-    errorMap: () => ({ message: "You must accept the terms and conditions" }),
+  termsAccepted: z.boolean().refine((v) => v, {
+    message: "You must accept the terms and conditions",
   }),
 });
 
@@ -169,9 +169,8 @@ export default function AppointmentPage() {
       })
       .catch((error) => {
         console.error("Error submitting form:", error);
-        toast("Something went wrong", {
+        toast.error("Something went wrong", {
           description: "There was a problem submitting your appointment request. Please try again.",
-          variant: "destructive",
         });
       })
       .finally(() => {
