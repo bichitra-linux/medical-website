@@ -29,16 +29,29 @@ type NotificationSettings = {
 };
 
 export default function SettingsPage() {
-  const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [userSettings, setUserSettings] = useState<UserSettings | null>(null);
-  const [notificationSettings, setNotificationSettings] = useState<NotificationSettings | null>(
-    null
-  );
+  const [notificationSettings, setNotificationSettings] = 
+  useState<NotificationSettings>({
+    emailNotifications: false,
+    appointmentReminders: false,
+    marketingEmails: false
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState("site");
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({
+  siteName: "",
+  contactEmail: "",
+  phoneNumber: "",
+  address: "",
+  socialLinks: {
+    facebook: "",
+    twitter: "",
+    instagram: ""
+  }
+});
 
   // Load mock settings data
   useEffect(() => {
@@ -111,33 +124,44 @@ export default function SettingsPage() {
   ) => {
     const { name, value } = e.target;
 
-    if (name.includes(".")) {
-      // Handle nested properties (like socialLinks.facebook)
-      const [parent, child] = name.split(".");
-      setSiteSettings((prev) => ({
+    if (name.startsWith("socialLinks.")) {
+      // only ever spread the socialLinks object
+      const key = name.split(".")[1] as keyof SiteSettings["socialLinks"];
+      setSiteSettings(prev => ({
         ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value,
-        },
+        socialLinks: {
+          ...prev.socialLinks,
+          [key]: value
+        }
       }));
     } else {
-      // Handle top-level properties
-      setSiteSettings((prev) => ({
+      // top‐level SiteSettings fields
+      setSiteSettings(prev => ({
         ...prev,
-        [name]: value,
+        [name as keyof SiteSettings]: value
       }));
     }
   };
 
   // Handle notification setting changes
   const handleNotificationSettingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setNotificationSettings((prev) => ({
+  const { name, checked } = e.target;
+  setNotificationSettings(prev => {
+    if (!prev) {
+      // first‐time init
+      return {
+        emailNotifications: false,
+        appointmentReminders: false,
+        marketingEmails: false,
+        [name]: checked
+      } as NotificationSettings;
+    }
+    return {
       ...prev,
-      [name]: checked,
-    }));
-  };
+      [name as keyof NotificationSettings]: checked
+    };
+  });
+};
 
   return (
     <>

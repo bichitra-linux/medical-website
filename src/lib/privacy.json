@@ -1,0 +1,36 @@
+{
+  "title": "Privacy Policy",
+  "subtitle": "Your privacy is important to us. This policy explains how we collect, use, and protect your information.",
+  "sections": [
+    {
+      "id": "collection",
+      "heading": "Information We Collect",
+      "content": "We collect personal information you provide when you book an appointment or contact us (e.g., name, email, phone). We also collect usage data such as IP addresses and pages visited."
+    },
+    {
+      "id": "use",
+      "heading": "How We Use Your Information",
+      "content": "We use your information to provide services, communicate appointment details, improve our website, and comply with legal obligations. We never sell your data to third parties."
+    },
+    {
+      "id": "sharing",
+      "heading": "Sharing Your Information",
+      "content": "Your data may be shared with service providers who help us run the site (e.g., hosting, email). All partners adhere to strict confidentiality obligations."
+    },
+    {
+      "id": "security",
+      "heading": "Data Security",
+      "content": "We implement industry-standard measures (encryption, access controls) to protect your data. However, no method is 100% secure."
+    },
+    {
+      "id": "rights",
+      "heading": "Your Rights",
+      "content": "You may review, update, or delete your personal information by contacting us at privacy@medical-center.com."
+    },
+    {
+      "id": "changes",
+      "heading": "Changes to This Policy",
+      "content": "We may update this policy from time to time. The “Last updated” date at the top will change when we do."
+    }
+  ]
+}
