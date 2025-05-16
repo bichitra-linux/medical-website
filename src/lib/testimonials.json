@@ -4,41 +4,41 @@
     "testimonials": [
       {
         "id": "1",
-        "quote": "The level of care I received at Purna Chandra Diagnostic Center was exceptional. The doctors took the time to listen to my concerns and develop a treatment plan tailored to my needs.",
-        "name": "John Doe",
-        "initials": "JD",
+        "quote": "Purna Chandra Diagnostic Center ma paeko sewa ati uttam thiyo. Doctors haru le mero samasya dhyan diyera sunnu bhayo ra malai aawashyak upchar ko lagi yogya yojana banaunubhayo.",
+        "name": "Raj Kumar Shrestha",
+        "initials": "RS",
         "since": "2018",
         "duration": "Patient since 2018"
       },
       {
         "id": "2",
-        "quote": "The staff at Purna Chandra Diagnostic Center are not only professional but also incredibly compassionate. They made a stressful situation much easier to handle for my entire family.",
-        "name": "Maria Smith",
-        "initials": "MS",
+        "quote": "Purna Chandra Diagnostic Center ko staff haru professional matra hoina, ati nai dayalu pani chan. Uniharu le mero pariwar ko lagi tanawpurna awastha lai sajilo banaidinu bhayo.",
+        "name": "Anjali Sharma",
+        "initials": "AS",
         "since": "2019",
         "duration": "Patient since 2019"
       },
       {
         "id": "3",
-        "quote": "I've been coming to Purna Chandra Diagnostic Center for years and have always received top-notch care. The new telemedicine options have made it even more convenient to manage my health.",
-        "name": "Robert Johnson",
-        "initials": "RJ",
+        "quote": "Ma dherai barsha dekhi Purna Chandra Diagnostic Center ma aaudai chu ra sadhai uttam sewa paeko chu. Naya telemedicine ko subidha le mero swasthya herchah garna ajhai sajilo banaeko cha.",
+        "name": "Krishna Prasad Adhikari",
+        "initials": "KA",
         "since": "2015",
         "duration": "Patient since 2015"
       },
       {
         "id": "4",
-        "quote": "The pediatric team took amazing care of my daughter. They made her feel comfortable and explained everything in a way that helped reduce her anxiety.",
-        "name": "Sarah Williams",
-        "initials": "SW",
+        "quote": "Pediatric team le mero chori ko ramro herchah garnubhayo. Uniharu le uslai comfortable feel garaunu bhayo ra sabai kura ustari bujhaunu bhayo jasle garda usko dar kam bhayo.",
+        "name": "Sarita Tamang",
+        "initials": "ST",
         "since": "2020",
         "duration": "Patient since 2020"
       },
       {
         "id": "5",
-        "quote": "As someone with chronic health issues, finding Purna Chandra Diagnostic Center has been life-changing. The continuity of care and attention to detail is unmatched.",
-        "name": "David Chen",
-        "initials": "DC",
+        "quote": "Dubai ma kaam garne visa ko lagi aawashyak medical checkup ko lagi ma yeha aayeko thiye. Sabai test haru professional tarika le chito ra sajilo garaidiyo, jasle garda mero visa process sajilo bhayo.",
+        "name": "Deepak Gurung",
+        "initials": "DG",
         "since": "2017",
         "duration": "Patient since 2017"
       }

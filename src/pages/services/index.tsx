@@ -24,14 +24,77 @@ import { Input } from "@/components/ui/input";
 import servicesData from "@/lib/services.json";
 import faqsData from "@/lib/faq.json";
 import iconMap from "@/lib/icon-map";
+import Head from "next/head";
+
+// Define types for our services data
+interface ServiceData {
+  id: string;
+  title: string;
+  description: string;
+  features: string[];
+  category: string;
+  color: string;
+  icon: string;
+  badge?: string | null;
+  price?: number;
+}
+
+interface CategoryData {
+  id: string;
+  name: string;
+  color: string;
+}
+
+interface ServicesApiResponse {
+  services: ServiceData[];
+  categories: CategoryData[];
+}
 
 export default function ServicesPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredServices, setFilteredServices] = useState(servicesData.services);
+  const [filteredServices, setFilteredServices] = useState<ServiceData[]>([]);
+  const [servicesData, setServicesData] = useState<{
+    services: ServiceData[];
+    categories: CategoryData[];
+  }>({
+    services: [],
+    categories: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch services data from the API
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch("/api/service");
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch services");
+        }
+
+        const data: ServicesApiResponse = await response.json();
+        setServicesData(data);
+        setIsLoading(false);
+      } catch (err) {
+        console.error("Error fetching services:", err);
+        setError("Failed to load services. Please try again later.");
+        setIsLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   // Filter services based on active tab and search term
   useEffect(() => {
+    if (!servicesData.services || servicesData.services.length === 0) {
+      setFilteredServices([]);
+      return;
+    }
+
     let result = [...servicesData.services];
 
     // Filter by category if not "all"
@@ -51,7 +114,7 @@ export default function ServicesPage() {
     }
 
     setFilteredServices(result);
-  }, [activeTab, searchTerm]);
+  }, [activeTab, searchTerm, servicesData.services]);
 
   // Handle tab change
   const handleTabChange = (value: string) => {
@@ -124,6 +187,9 @@ export default function ServicesPage() {
 
   return (
     <>
+      <Head>
+        <title>Services | Purna Chandra Diagnostic</title>
+      </Head>
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-blue-50 to-blue-100 py-16 md:py-20">
         <div className="container mx-auto px-4">
@@ -155,133 +221,179 @@ export default function ServicesPage() {
       {/* Service Categories */}
       <section className="py-12 md:py-16 bg-gradient-to-b from-white to-blue-50">
         <div className="container mx-auto px-4">
-          <Tabs
-            defaultValue="all"
-            value={activeTab}
-            onValueChange={handleTabChange}
-            className="max-w-4xl mx-auto"
-          >
-            <div className="flex justify-center mb-8 w-full">
-              <TabsList className="w-full max-w-3xl grid grid-cols-3 md:grid-cols-5 gap-1.5 p-1.5 bg-white rounded-xl shadow-md border border-blue-100 min-h-[50px]">
-                {servicesData.categories.map((category) => {
-                  // Define color classes with typed safety
-                  const activeColorClass = (() => {
-                    switch (category.color) {
-                      case "blue":
-                        return "data-[state=active]:bg-blue-600";
-                      case "green":
-                        return "data-[state=active]:bg-green-600";
-                      case "amber":
-                        return "data-[state=active]:bg-amber-600";
-                      case "purple":
-                        return "data-[state=active]:bg-purple-600";
-                      case "red":
-                        return "data-[state=active]:bg-red-600";
-                      default:
-                        return "data-[state=active]:bg-blue-600";
-                    }
-                  })();
+          {isLoading ? (
+            // Loading state
+            <div className="max-w-4xl mx-auto">
+              <div className="animate-pulse space-y-6">
+                <div className="h-12 bg-gray-200 rounded-xl w-full max-w-3xl mx-auto"></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="h-64 bg-gray-100 rounded-xl"></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ) : error ? (
+            // Error state
+            <div className="max-w-4xl mx-auto">
+              <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-xl text-center">
+                <p>{error}</p>
+                <Button
+                  onClick={() => window.location.reload()}
+                  className="mt-4 bg-blue-600 text-white"
+                >
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Tabs
+              defaultValue="all"
+              value={activeTab}
+              onValueChange={handleTabChange}
+              className="max-w-4xl mx-auto"
+            >
+              <div className="flex justify-center mb-8 w-full">
+                <TabsList className="w-full max-w-4xl grid grid-cols-3 md:grid-cols-6 gap-1.5 p-1.5 bg-white rounded-xl shadow-md border border-blue-100 min-h-[50px]">
+                  {servicesData.categories.map((category) => {
+                    // Define color classes with typed safety
+                    const activeColorClass = (() => {
+                      switch (category.color) {
+                        case "blue":
+                          return "data-[state=active]:bg-blue-600";
+                        case "green":
+                          return "data-[state=active]:bg-green-600";
+                        case "amber":
+                          return "data-[state=active]:bg-amber-600";
+                        case "purple":
+                          return "data-[state=active]:bg-purple-600";
+                        case "red":
+                          return "data-[state=active]:bg-red-600";
+                        default:
+                          return "data-[state=active]:bg-blue-600";
+                      }
+                    })();
 
-                  return (
-                    <TabsTrigger
-                      key={category.id}
-                      value={category.id}
-                      className={`rounded-lg flex items-center justify-center h-full py-1.5 px-2 text-sm md:text-base font-medium transition-all duration-200
+                    // Abbreviate "Foreign Medical" on smallest screens
+                    const displayName =
+                      category.id === "foreign_medical" ? (
+                        <span>
+                          <span className="hidden sm:inline md:hidden">Foreign Med</span>
+                          <span className="hidden md:inline">Foreign Medical</span>
+                          <span className="sm:hidden">Foreign</span>
+                        </span>
+                      ) : (
+                        category.name
+                      );
+
+                    return (
+                      <TabsTrigger
+                        key={category.id}
+                        value={category.id}
+                        className={`rounded-lg flex items-center justify-center h-full py-1.5 px-2 text-sm md:text-base font-medium transition-all duration-200
             text-gray-700 hover:bg-gray-50
             data-[state=active]:shadow-sm ${activeColorClass} data-[state=active]:text-white`}
-                    >
-                      <span className="truncate">{category.name}</span>
-                    </TabsTrigger>
-                  );
-                })}
-              </TabsList>
-            </div>
-
-            <TabsContent value={activeTab} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {filteredServices.map((service) => {
-                  const colorClasses = getColorClasses(service.color);
-
-                  return (
-                    <Card
-                      key={service.id}
-                      className="group border border-blue-100 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col h-full"
-                    >
-                      <CardHeader
-                        className={`pb-2 bg-gradient-to-br ${colorClasses.gradient} h-[140px]`}
                       >
-                        <div
-                          className={`w-12 h-12 bg-gradient-to-br ${colorClasses.iconBg} rounded-full flex items-center justify-center mb-3 ${colorClasses.text} shadow-sm group-hover:scale-110 transition-transform`}
-                        >
-                          {getIconComponent(service.icon)}
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <CardTitle className={`text-xl ${colorClasses.darkText}`}>
-                            {service.title}
-                          </CardTitle>
-                          {service.badge && (
-                            <Badge
-                              className={`bg-${service.color}-100 ${colorClasses.text} hover:bg-${service.color}-200 shadow-sm`}
-                            >
-                              {service.badge}
-                            </Badge>
-                          )}
-                        </div>
-                        <CardDescription className={`${colorClasses.text} min-h-[20px]`}>
-                          {service.description}
-                        </CardDescription>
-                      </CardHeader>
-
-                      <CardContent className="bg-white flex-grow h-[144px] py-4">
-                        <ul className="space-y-2 text-gray-700">
-                          {service.features.map((feature, index) => (
-                            <li key={index} className="flex items-start">
-                              <ChevronRight
-                                className={`h-4 w-4 ${colorClasses.text} mt-1 mr-2 flex-shrink-0`}
-                              />
-                              <span>{feature}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </CardContent>
-
-                      <CardFooter
-                        className={`bg-white border-t ${colorClasses.border} mt-auto p-4`}
-                      >
-                        <Button
-                          variant="outline"
-                          className={`w-full border-${service.color}-600 ${colorClasses.text} ${colorClasses.hover} hover:text-white transition-colors`}
-                        >
-                          Learn More <ChevronRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  );
-                })}
+                        <span className="truncate">{displayName}</span>
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
               </div>
 
-              {filteredServices.length === 0 && (
-                <div className="text-center py-12">
-                  <p className="text-gray-500 text-lg">
-                    No services found. Try different search terms or category.
-                  </p>
-                </div>
-              )}
+              <TabsContent value={activeTab} className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {filteredServices.map((service) => {
+                    const colorClasses = getColorClasses(service.color);
 
-              {activeTab !== "all" && filteredServices.length > 0 && (
-                <div className="text-center mt-8">
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md"
-                    onClick={() => handleTabChange("all")}
-                  >
-                    View All Services <Plus className="ml-2 h-4 w-4" />
-                  </Button>
+                    return (
+                      <Card
+                        key={service.id}
+                        className="group border border-blue-100 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden flex flex-col h-full"
+                      >
+                        <CardHeader
+                          className={`pb-2 bg-gradient-to-br ${colorClasses.gradient} h-[140px]`}
+                        >
+                          <div
+                            className={`w-12 h-12 bg-gradient-to-br ${colorClasses.iconBg} rounded-full flex items-center justify-center mb-3 ${colorClasses.text} shadow-sm group-hover:scale-110 transition-transform`}
+                          >
+                            {getIconComponent(service.icon)}
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <CardTitle className={`text-xl ${colorClasses.darkText}`}>
+                              {service.title}
+                            </CardTitle>
+                            {service.badge && (
+                              <Badge
+                                className={`bg-${service.color}-100 ${colorClasses.text} hover:bg-${service.color}-200 shadow-sm`}
+                              >
+                                {service.badge}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between mt-1">
+                            <CardDescription className={`${colorClasses.text} min-h-[20px]`}>
+                              {service.description}
+                            </CardDescription>
+                            <div
+                              className={`font-semibold text-base ${colorClasses.darkText} bg-white/80 px-2 py-0.5 rounded-md shadow-sm`}
+                            >
+                              {service.price ? `Rs. ${service.price}` : "Contact for price"}
+                            </div>
+                          </div>
+                        </CardHeader>
+
+                        <CardContent className="bg-white flex-grow h-[144px] py-4">
+                          <ul className="space-y-2 text-gray-700">
+                            {service.features.map((feature, index) => (
+                              <li key={index} className="flex items-start">
+                                <ChevronRight
+                                  className={`h-4 w-4 ${colorClasses.text} mt-1 mr-2 flex-shrink-0`}
+                                />
+                                <span>{feature}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </CardContent>
+
+                        <CardFooter
+                          className={`bg-white border-t ${colorClasses.border} mt-auto p-4`}
+                        >
+                          <Button
+                            variant="outline"
+                            className={`w-full border-${service.color}-600 ${colorClasses.text} ${colorClasses.hover} hover:text-white transition-colors`}
+                          >
+                            Learn More <ChevronRight className="ml-2 h-4 w-4" />
+                          </Button>
+                        </CardFooter>
+                      </Card>
+                    );
+                  })}
                 </div>
-              )}
-            </TabsContent>
-          </Tabs>
+
+                {filteredServices.length === 0 && (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500 text-lg">
+                      No services found. Try different search terms or category.
+                    </p>
+                  </div>
+                )}
+
+                {activeTab !== "all" && filteredServices.length > 0 && (
+                  <div className="text-center mt-8">
+                    <Button
+                      variant="default"
+                      size="lg"
+                      className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md"
+                      onClick={() => handleTabChange("all")}
+                    >
+                      View All Services <Plus className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          )}
         </div>
       </section>
 
