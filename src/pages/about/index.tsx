@@ -9,7 +9,35 @@ import iconMap from "@/lib/icon-map";
 import historyData from "@/lib/history.json";
 import valuesData from "@/lib/values.json";
 import teamData from "@/lib/team.json";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
+import { Heart as HeartIcon } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Card as CarouselCard } from "@/components/ui/card";
 
+
+
+// Define interfaces for the data structure
+interface Doctor {
+  id: string;
+  name: string;
+  specialty: string;
+  qualifications: string;
+  nmcNumber: string;
+  bio: string;
+  image?: string;
+  isActive: boolean;
+}
+
+interface Staff {
+  id: string;
+  name: string;
+  roleLabel: string;
+  qualifications: string;
+  bio: string;
+  image?: string;
+  isActive: boolean;
+}
 // Add this function if it doesn't exist yet
 const getIconComponent = (iconName: string) => {
   const IconComponent = iconMap[iconName];
@@ -17,6 +45,62 @@ const getIconComponent = (iconName: string) => {
 };
 
 export default function AboutUs() {
+
+  // State for API data
+  const [activeDoctors, setActiveDoctors] = useState<Doctor[]>([]);
+  const [activeStaffs, setActiveStaffs] = useState<Staff[]>([]);
+  const [isLoadingDoctors, setIsLoadingDoctors] = useState(true);
+  const [isLoadingStaffs, setIsLoadingStaffs] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch doctors data
+  useEffect(() => {
+    async function fetchDoctors() {
+      try {
+        setIsLoadingDoctors(true);
+        const res = await fetch("/api/doctors");
+        
+        if (!res.ok) {
+          throw new Error("Failed to fetch doctors");
+        }
+        
+        const data = await res.json();
+        setActiveDoctors(data.activeDoctors);
+      } catch (err) {
+        console.error("Error fetching doctors:", err);
+        setError("Failed to load doctors");
+      } finally {
+        setIsLoadingDoctors(false);
+      }
+    }
+    
+    fetchDoctors();
+  }, []);
+
+  // Fetch staff data
+  useEffect(() => {
+    async function fetchStaffs() {
+      try {
+        setIsLoadingStaffs(true);
+        const res = await fetch("/api/staffs");
+        
+        if (!res.ok) {
+          throw new Error("Failed to fetch staff");
+        }
+        
+        const data = await res.json();
+        setActiveStaffs(data.activeStaffs);
+      } catch (err) {
+        console.error("Error fetching staff:", err);
+        setError("Failed to load staff");
+      } finally {
+        setIsLoadingStaffs(false);
+      }
+    }
+    
+    fetchStaffs();
+  }, []);
+
   return (
     <>
       {/* Hero Section */}
@@ -193,149 +277,137 @@ export default function AboutUs() {
           {/* Doctors Section */}
           <div className="mb-16">
             <h3 className="text-2xl font-bold text-gray-800 mb-2 text-center">
-              {teamData.categories.doctors.title}
+              Medical Doctors
             </h3>
             <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
-              {teamData.categories.doctors.subtitle}
+              Our experienced physicians and specialists
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {teamData.categories.doctors.members.map((doctor) => (
-                <div
-                  key={doctor.id}
-                  className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg"
-                >
-                  <div className="h-64 bg-blue-100 flex items-center justify-center relative">
-                    {doctor.image ? (
-                      <Image
-                        src={doctor.image}
-                        alt={doctor.imageAlt || doctor.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                    ) : (
-                      <div className="h-24 w-24 text-blue-300">
-                        {getIconComponent(doctor.placeholderIcon) || <User className="h-24 w-24" />}
+            {isLoadingDoctors ? (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                <span className="ml-2 text-gray-600">Loading doctors...</span>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-red-500">{error}</div>
+            ) : activeDoctors.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">No doctors found</div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {activeDoctors.slice(0, 3).map((doctor) => (
+                    <div
+                      key={doctor.id}
+                      className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg"
+                    >
+                      <div className="h-64 bg-blue-100 flex items-center justify-center relative">
+                        {doctor.image ? (
+                          <Image
+                            src={doctor.image}
+                            alt={doctor.name}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                        ) : (
+                          <div className="h-24 w-24 text-blue-300">
+                            <User className="h-24 w-24" />
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-800">{doctor.name}</h3>
-                    <p className="text-blue-600 mb-1">{doctor.title}</p>
-                    {doctor.specialty && (
-                      <p className="text-sm text-blue-500 mb-3">Specialty: {doctor.specialty}</p>
-                    )}
-                    <p className="text-gray-600 mb-4">{doctor.bio}</p>
-
-                    {doctor.socials && doctor.socials.length > 0 && (
-                      <div className="flex space-x-3">
-                        {doctor.socials.map((social) => (
-                          <Link
-                            key={social.platform}
-                            href={social.url}
-                            className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                            aria-label={`${social.platform} profile for ${doctor.name}`}
-                          >
-                            {getIconComponent(social.icon) ||
-                              (social.platform === "linkedin" ? (
-                                <Linkedin className="h-5 w-5" />
-                              ) : social.platform === "twitter" ? (
-                                <Twitter className="h-5 w-5" />
-                              ) : null)}
-                          </Link>
-                        ))}
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold text-gray-800">{doctor.name}</h3>
+                        <p className="text-blue-600 mb-1">{doctor.specialty}</p>
+                        <p className="text-sm text-blue-500 mb-3">NMC: {doctor.nmcNumber}</p>
+                        <p className="text-gray-600 mb-4">
+                          {doctor.bio.length > 120 ? `${doctor.bio.substring(0, 120)}...` : doctor.bio}
+                        </p>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            <div className="text-center mt-8">
-              <Link
-                href={teamData.categories.doctors.viewAllLink}
-                className="inline-flex items-center bg-blue-100 hover:bg-blue-200 text-blue-700 px-6 py-3 rounded-md font-medium transition-all duration-300"
-              >
-                {teamData.categories.doctors.viewAllText}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </div>
+                <div className="text-center mt-8">
+                  <Link
+                    href="/doctors"
+                    className="inline-flex items-center bg-blue-100 hover:bg-blue-200 text-blue-700 px-6 py-3 rounded-md font-medium transition-all duration-300"
+                  >
+                    View All Doctors
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Staff Section */}
           <div className="mb-16">
             <h3 className="text-2xl font-bold text-gray-800 mb-2 text-center">
-              {teamData.categories.staff.title}
+              Support Staff
             </h3>
             <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
-              {teamData.categories.staff.subtitle}
+              The dedicated team that ensures seamless care
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {teamData.categories.staff.members.map((staff) => (
-                <div
-                  key={staff.id}
-                  className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg"
-                >
-                  <div className="h-64 bg-blue-100 flex items-center justify-center relative">
-                    {staff.image ? (
-                      <Image
-                        src={staff.image}
-                        alt={staff.imageAlt || staff.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                    ) : (
-                      <div className="h-24 w-24 text-blue-300">
-                        {getIconComponent(staff.placeholderIcon) || <User className="h-24 w-24" />}
+            {isLoadingStaffs ? (
+              <div className="flex justify-center items-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                <span className="ml-2 text-gray-600">Loading staff...</span>
+              </div>
+            ) : error ? (
+              <div className="text-center py-8 text-red-500">{error}</div>
+            ) : activeStaffs.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">No staff found</div>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {activeStaffs.slice(0, 3).map((staff) => (
+                    <div
+                      key={staff.id}
+                      className="bg-white rounded-lg overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg"
+                    >
+                      <div className="h-64 bg-blue-100 flex items-center justify-center relative">
+                        {staff.image ? (
+                          <Image
+                            src={staff.image}
+                            alt={staff.name}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                        ) : (
+                          <div className="h-24 w-24 text-blue-300">
+                            <User className="h-24 w-24" />
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-800">{staff.name}</h3>
-                    <p className="text-blue-600 mb-3">{staff.title}</p>
-                    <p className="text-gray-600 mb-4">{staff.bio}</p>
-
-                    {staff.socials && staff.socials.length > 0 && (
-                      <div className="flex space-x-3">
-                        {staff.socials.map((social) => (
-                          <Link
-                            key={social.platform}
-                            href={social.url}
-                            className="text-blue-600 hover:text-blue-800 transition-colors duration-200"
-                            aria-label={`${social.platform} profile for ${staff.name}`}
-                          >
-                            {getIconComponent(social.icon) ||
-                              (social.platform === "linkedin" ? (
-                                <Linkedin className="h-5 w-5" />
-                              ) : social.platform === "twitter" ? (
-                                <Twitter className="h-5 w-5" />
-                              ) : null)}
-                          </Link>
-                        ))}
+                      <div className="p-6">
+                        <h3 className="text-xl font-semibold text-gray-800">{staff.name}</h3>
+                        <p className="text-blue-600 mb-1">{staff.roleLabel}</p>
+                        <p className="text-gray-600 mb-4">
+                          {staff.bio.length > 120 ? `${staff.bio.substring(0, 120)}...` : staff.bio}
+                        </p>
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            <div className="text-center mt-8">
-              <Link
-                href={teamData.categories.staff.viewAllLink}
-                className="inline-flex items-center bg-blue-100 hover:bg-blue-200 text-blue-700 px-6 py-3 rounded-md font-medium transition-all duration-300"
-              >
-                {teamData.categories.staff.viewAllText}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </div>
+                <div className="text-center mt-8">
+                  <Link
+                    href="/staff"
+                    className="inline-flex items-center bg-blue-100 hover:bg-blue-200 text-blue-700 px-6 py-3 rounded-md font-medium transition-all duration-300"
+                  >
+                    View All Staff
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Testimonials - UPDATED to use carousel */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
@@ -343,41 +415,43 @@ export default function AboutUs() {
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">{testimonialsData.subtitle}</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonialsData.testimonials.slice(0, 3).map((testimonial) => (
-              <Card key={testimonial.id} className="relative border-0 shadow-md">
-                <div className="absolute top-4 left-4 text-blue-200">
-                  <Quote className="h-10 w-10" />
-                </div>
-                <CardContent className="pt-10 pb-4">
-                  <p className="text-gray-600 italic">"{testimonial.quote}"</p>
-                </CardContent>
-                <CardFooter className="flex items-center pt-2 border-t border-gray-100">
-                  <Avatar className="h-10 w-10 bg-blue-100 border-2 border-blue-200">
-                    <AvatarFallback className="text-blue-600 font-medium text-sm">
-                      {testimonial.initials}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="ml-4">
-                    <h4 className="font-semibold text-gray-800 text-sm">{testimonial.name}</h4>
-                    <p className="text-gray-500 text-xs">{testimonial.duration}</p>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-
-          {testimonialsData.testimonials.length > 3 && (
-            <div className="text-center mt-10">
-              <Link
-                href="/testimonials"
-                className="inline-flex items-center bg-blue-100 hover:bg-blue-200 text-blue-700 px-6 py-3 rounded-md font-medium transition-all duration-300"
-              >
-                View More Testimonials
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="max-w-5xl mx-auto"
+          >
+            <CarouselContent>
+              {testimonialsData.testimonials.map((testimonial) => (
+                <CarouselItem key={testimonial.id} className="md:basis-1/2 lg:basis-1/3 pl-4">
+                  <Card className="relative border-0 shadow-md h-full">
+                    <div className="absolute top-4 left-4 text-blue-200">
+                      <Quote className="h-10 w-10" />
+                    </div>
+                    <CardContent className="pt-10 pb-4">
+                      <p className="text-gray-600 italic">"{testimonial.quote}"</p>
+                    </CardContent>
+                    <CardFooter className="flex items-center pt-2 border-t border-gray-100">
+                      <Avatar className="h-10 w-10 bg-blue-100 border-2 border-blue-200">
+                        <AvatarFallback className="text-blue-600 font-medium text-sm">
+                          {testimonial.initials}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="ml-4">
+                        <h4 className="font-semibold text-gray-800 text-sm">{testimonial.name}</h4>
+                        <p className="text-gray-500 text-xs">{testimonial.duration}</p>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex justify-center gap-2 mt-4">
+              <CarouselPrevious className="relative static" />
+              <CarouselNext className="relative static" />
             </div>
-          )}
+          </Carousel>
         </div>
       </section>
 
