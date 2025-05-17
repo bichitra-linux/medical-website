@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import contactData from "@/lib/contact.json"; // Adjust the import path as necessary
 import { usePathname } from "next/navigation";
 import { useAppointmentsSwitch } from "@/context/AppointmentSwitchContext"; // Adjust the import path as necessary
+import { useSiteSettings } from "@/context/SettingsContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,9 +14,14 @@ const Header = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { appointmentsEnabled } = useAppointmentsSwitch();
+  const { settings, isLoading } = useSiteSettings();
 
-  
-  const isAdmin = pathname.startsWith('/admin') || pathname.startsWith('/dashboard') || pathname.startsWith('/auth') || pathname.startsWith('/login') || pathname.startsWith('/register');
+  const isAdmin =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/auth") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register");
 
   // Handle scroll effect for enhanced header appearance
   useEffect(() => {
@@ -36,8 +42,31 @@ const Header = () => {
     setIsMenuOpen(false);
   }, [router.asPath]);
 
-  if(isAdmin) {
+  // Get primary phone number for display
+  const primaryPhone = settings?.phoneNumbers?.[0] || "";
+
+  if (isAdmin) {
     return null; // Prevent rendering if the component is not mounted
+  }
+
+  // If settings are still loading, show a simplified header
+  if (isLoading) {
+    return (
+      <header className="bg-white sticky top-0 z-50 shadow-sm py-3">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between">
+            <div className="h-16 w-24 bg-gray-100 animate-pulse rounded"></div>
+            <div className="hidden md:block">
+              <div className="flex space-x-6">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="w-20 h-4 bg-gray-100 animate-pulse rounded"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+    );
   }
 
   return (
@@ -53,8 +82,8 @@ const Header = () => {
             <Link href="/" className="flex items-center space-x-2">
               <div className="relative h-16 w-24">
                 <Image
-                  src="/images/image.png"
-                  alt="Purna Chandra Diagnostic Center Logo"
+                  src={settings?.logoUrl || "/images/image.png"}
+                  alt={`${settings?.title || "Medical Center"} Logo`}
                   fill
                   className="object-contain"
                   priority
@@ -64,51 +93,46 @@ const Header = () => {
                   }}
                 />
               </div>
-              <span className="text-blue-600 text-2xl font-bold">Purna Chandra Diagnostic</span>
+              <span className="text-blue-600 text-2xl font-bold">
+                {settings?.title || "Medical Center"}
+              </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
-            {[
-              { name: "Home", path: "/" },
-              { name: "About Us", path: "/about" },
-              { name: "Services", path: "/services" },
-              { name: "Gallery", path: "/gallery" },
-              { name: "Contact", path: "/contact" },
-            ].map((item) => (
-              <Link
-                key={item.path}
-                href={item.path}
-                className={`py-2 px-1 border-b-2 ${
-                  router.pathname === item.path
-                    ? "border-blue-600 text-blue-600 font-medium"
-                    : "border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-300 font-medium"
-                } transition-colors duration-200`}
-              >
-                {item.name}
-              </Link>
-            ))}
+            {settings?.headerLinks
+              .filter((item) => item.enabled)
+              .map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`py-2 px-1 border-b-2 ${
+                    router.pathname === item.path
+                      ? "border-blue-600 text-blue-600 font-medium"
+                      : "border-transparent text-gray-700 hover:text-blue-600 hover:border-blue-300 font-medium"
+                  } transition-colors duration-200`}
+                >
+                  {item.name}
+                </Link>
+              ))}
           </nav>
 
           {/* Contact & Appointment Button */}
           <div className="hidden md:flex items-center space-x-4">
             <div className="text-right">
               <p className="text-gray-600 text-sm">Contact: </p>
-              <a
-                href={contactData.phone.contacts.find((c) => c.label === "Contact")?.href}
-                className="text-blue-600 font-bold hover:underline"
-              >
-                {contactData.phone.contacts.find((c) => c.label === "Contact")?.value}
+              <a href={`tel:${primaryPhone}`} className="text-blue-600 font-bold hover:underline">
+                {primaryPhone}
               </a>
             </div>
             {appointmentsEnabled && (
-            <Link
-              href="/appointment"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition duration-300 shadow-sm hover:shadow"
-            >
-              Book Appointment
-            </Link>
+              <Link
+                href="/appointment"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium transition duration-300 shadow-sm hover:shadow"
+              >
+                Book Appointment
+              </Link>
             )}
           </div>
 
@@ -151,29 +175,24 @@ const Header = () => {
           }`}
         >
           <nav className="flex flex-col space-y-3">
-            {[
-              { name: "Home", path: "/" },
-              { name: "About Us", path: "/about" },
-              { name: "Services", path: "/services" },
-              
-              { name: "Gallery", path: "/gallery" },
-              { name: "Contact", path: "/contact" },
-            ].map((item) => (
-              <Link
-                key={item.path}
-                href={item.path}
-                className={`px-2 py-2 rounded-md ${
-                  router.pathname === item.path
-                    ? "bg-blue-50 text-blue-600 font-medium"
-                    : "text-gray-700 hover:bg-gray-50 hover:text-blue-600 font-medium"
-                }`}
-              >
-                {item.name}
-              </Link>
-            ))}
+            {settings?.headerLinks
+              .filter(item => item.enabled)
+              .map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`px-2 py-2 rounded-md ${
+                    router.pathname === item.path
+                      ? "bg-blue-50 text-blue-600 font-medium"
+                      : "text-gray-700 hover:bg-gray-50 hover:text-blue-600 font-medium"
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              ))}
             <div className="pt-3 px-2">
               <p className="text-gray-600 text-sm">
-                Emergency: <span className="text-blue-600 font-bold">+1 (123) 456-7890</span>
+                Contact: <span className="text-blue-600 font-bold">{primaryPhone}</span>
               </p>
               {appointmentsEnabled && (
               <Link

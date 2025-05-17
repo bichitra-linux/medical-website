@@ -97,18 +97,26 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        // For development, we'll simulate API delay and use localStorage
-        await new Promise((r) => setTimeout(r, 400));
+        setIsLoading(true);
+        // Fetch settings from API
+        const response = await fetch('/api/settings');
         
-        const savedSettings = localStorage.getItem("siteSettings");
-        if (savedSettings) {
-          setSettings(JSON.parse(savedSettings));
+        if (!response.ok) {
+          throw new Error('Failed to load settings');
+        }
+        
+        const data = await response.json();
+        
+        // If we have data from the API, use it
+        if (data && Object.keys(data).length > 0) {
+          setSettings(data as SiteSettings);
         } else {
+          // Otherwise use default settings
           setSettings(defaultSettings);
-          localStorage.setItem("siteSettings", JSON.stringify(defaultSettings));
         }
       } catch (error) {
         console.error("Failed to load settings:", error);
+        // Fallback to default settings
         setSettings(defaultSettings);
       } finally {
         setIsLoading(false);
@@ -121,9 +129,19 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const updateSettings = async (newSettings: SiteSettings): Promise<void> => {
     setIsLoading(true);
     try {
-      // Simulate API call
-      await new Promise((r) => setTimeout(r, 500));
-      localStorage.setItem("siteSettings", JSON.stringify(newSettings));
+      // Save settings via API
+      const response = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newSettings),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to save settings');
+      }
+      
       setSettings(newSettings);
     } catch (error) {
       console.error("Failed to save settings:", error);
