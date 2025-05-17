@@ -5,6 +5,13 @@ import { Tab } from "@headlessui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { InstagramEmbed, TwitterEmbed, FacebookEmbed } from "react-social-media-embed";
 import { X, ChevronLeft, ChevronRight, Instagram, Facebook, Twitter, Loader } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 // Type definitions for gallery data
 type Category = "facility" | "team" | "events";
@@ -27,7 +34,8 @@ type GalleryData = {
 const socialMediaPosts = {
   instagram: "https://www.instagram.com/p/CdJA9M4JnKQ/",
   twitter: "https://twitter.com/WHO/status/1516096550220591105",
-  facebook: "https://www.facebook.com/WHO/posts/pfbid02LkgfC9Bh8dz1wJhyBxnJYad1HmNPUsmfxpELewS6auZcigTKJcLa2rvPJpXoMBKDl",
+  facebook:
+    "https://www.facebook.com/WHO/posts/pfbid02LkgfC9Bh8dz1wJhyBxnJYad1HmNPUsmfxpELewS6auZcigTKJcLa2rvPJpXoMBKDl",
 };
 
 export default function GalleryPage() {
@@ -46,14 +54,14 @@ export default function GalleryPage() {
     const fetchAllImages = async () => {
       setIsLoading(true);
       setLoadingError(null);
-      
+
       try {
         const [facilityData, teamData, eventsData] = await Promise.all([
           fetchCategoryImages("facility"),
           fetchCategoryImages("team"),
           fetchCategoryImages("events"),
         ]);
-        
+
         setGalleryData({
           facility: facilityData,
           team: teamData,
@@ -66,24 +74,24 @@ export default function GalleryPage() {
         setIsLoading(false);
       }
     };
-    
+
     fetchAllImages();
   }, []);
-  
+
   // Function to fetch images for a specific category
   const fetchCategoryImages = async (category: Category): Promise<GalleryImage[]> => {
     try {
       const response = await fetch(`/api/cloudinary/list?folder=gallery/${category}`);
       if (!response.ok) throw new Error(`Failed to fetch ${category} images`);
-      
+
       const data = await response.json();
       if (!data.resources || !Array.isArray(data.resources)) return [];
-      
+
       return data.resources.map((resource: any) => ({
         id: resource.public_id,
         src: resource.secure_url,
-        alt: resource.context?.alt || resource.public_id.split('/').pop(),
-        title: resource.context?.caption || resource.public_id.split('/').pop(),
+        alt: resource.context?.alt || resource.public_id.split("/").pop(),
+        title: resource.context?.caption || resource.public_id.split("/").pop(),
         width: resource.width,
         height: resource.height,
         category: category,
@@ -111,9 +119,9 @@ export default function GalleryPage() {
   // Navigate to next image in lightbox
   const nextImage = () => {
     if (!selectedImage) return;
-    
+
     const currentImages = galleryData[currentCategory];
-    const currentIndex = currentImages.findIndex(img => img.id === selectedImage.id);
+    const currentIndex = currentImages.findIndex((img) => img.id === selectedImage.id);
     const nextIndex = (currentIndex + 1) % currentImages.length;
     setSelectedImage(currentImages[nextIndex]);
   };
@@ -121,9 +129,9 @@ export default function GalleryPage() {
   // Navigate to previous image in lightbox
   const prevImage = () => {
     if (!selectedImage) return;
-    
+
     const currentImages = galleryData[currentCategory];
-    const currentIndex = currentImages.findIndex(img => img.id === selectedImage.id);
+    const currentIndex = currentImages.findIndex((img) => img.id === selectedImage.id);
     const prevIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
     setSelectedImage(currentImages[prevIndex]);
   };
@@ -132,7 +140,7 @@ export default function GalleryPage() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedImage) return;
-      
+
       switch (e.key) {
         case "ArrowRight":
           nextImage();
@@ -159,25 +167,24 @@ export default function GalleryPage() {
 
   // Handle image loading errors
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpolyline points='21 15 16 10 5 21'/%3E%3C/svg%3E";
+    e.currentTarget.src =
+      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpolyline points='21 15 16 10 5 21'/%3E%3C/svg%3E";
   };
 
   return (
     <>
       <Head>
         <title>Photo Gallery | Purna Chandra Diagnostic Center</title>
-        
       </Head>
 
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-50 to-blue-100 py-16 md:py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
-              Our Gallery
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Our Gallery</h1>
             <p className="text-lg text-gray-600 mb-8">
-              Take a tour of our facilities, meet our team, and see our events through our photo gallery.
+              Take a tour of our facilities, meet our team, and see our events through our photo
+              gallery.
             </p>
           </div>
         </div>
@@ -193,9 +200,10 @@ export default function GalleryPage() {
                   key={category}
                   className={({ selected }) =>
                     `w-full rounded-lg py-2.5 text-sm font-medium leading-5 
-                    ${selected 
-                      ? 'bg-white text-blue-700 shadow' 
-                      : 'text-gray-600 hover:bg-blue-100 hover:text-blue-700'
+                    ${
+                      selected
+                        ? "bg-white text-blue-700 shadow"
+                        : "text-gray-600 hover:bg-blue-100 hover:text-blue-700"
                     }`
                   }
                 >
@@ -203,7 +211,7 @@ export default function GalleryPage() {
                 </Tab>
               ))}
             </Tab.List>
-            
+
             <Tab.Panels>
               {Object.values(galleryData).map((images, idx) => (
                 <Tab.Panel key={idx} className="focus:outline-none">
@@ -215,19 +223,19 @@ export default function GalleryPage() {
                   ) : loadingError ? (
                     <div className="text-center py-12">
                       <p className="text-red-500">{loadingError}</p>
-                      <button 
+                      <button
                         onClick={() => {
                           setIsLoading(true);
                           setLoadingError(null);
                           fetchCategoryImages(currentCategory)
-                            .then(images => {
-                              setGalleryData(prev => ({
+                            .then((images) => {
+                              setGalleryData((prev) => ({
                                 ...prev,
-                                [currentCategory]: images
+                                [currentCategory]: images,
                               }));
                               setIsLoading(false);
                             })
-                            .catch(err => {
+                            .catch((err) => {
                               console.error("Error reloading images:", err);
                               setLoadingError("Failed to reload images.");
                               setIsLoading(false);
@@ -243,31 +251,44 @@ export default function GalleryPage() {
                       <p className="text-gray-500">No images found in this category.</p>
                     </div>
                   ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {images.map((image) => (
-                        <motion.div
-                          key={image.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="overflow-hidden rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-300"
-                          onClick={() => openLightbox(image)}
-                        >
-                          <div className="relative h-72">
-                            <Image
-                              src={image.src}
-                              alt={image.alt}
-                              fill
-                              className="object-cover transition-transform duration-500 hover:scale-105"
-                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                              onError={handleImageError}
-                            />
-                          </div>
-                          <div className="p-4 bg-white">
-                            <h3 className="text-lg font-medium text-gray-800">{image.title}</h3>
-                          </div>
-                        </motion.div>
-                      ))}
+                    <div className="px-4 md:px-10">
+                      <Carousel className="w-full">
+                        <CarouselContent>
+                          {images.map((image) => (
+                            <CarouselItem
+                              key={image.id}
+                              className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4"
+                            >
+                              <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="h-full p-2"
+                              >
+                                <div
+                                  className="overflow-hidden rounded-lg shadow-md cursor-pointer hover:shadow-lg transition-shadow duration-300 h-full flex flex-col"
+                                  onClick={() => openLightbox(image)}
+                                >
+                                  <div className="relative h-72 flex-grow">
+                                    <Image
+                                      src={image.src}
+                                      alt={image.alt}
+                                      fill
+                                      className="object-cover transition-transform duration-500 hover:scale-105"
+                                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                      onError={handleImageError}
+                                    />
+                                  </div>
+                                </div>
+                              </motion.div>
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        <div className="flex justify-center gap-2 mt-6">
+                          <CarouselPrevious className="static transform-none mr-2 bg-blue-600 hover:bg-blue-700 text-white border-none" />
+                          <CarouselNext className="static transform-none ml-2 bg-blue-600 hover:bg-blue-700 text-white border-none" />
+                        </div>
+                      </Carousel>
                     </div>
                   )}
                 </Tab.Panel>
@@ -281,11 +302,10 @@ export default function GalleryPage() {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-800 mb-4">
-              Connect With Us
-            </h2>
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Connect With Us</h2>
             <p className="text-gray-600">
-              Follow us on social media to stay updated with our latest news, health tips, and community events.
+              Follow us on social media to stay updated with our latest news, health tips, and
+              community events.
             </p>
           </div>
 
@@ -333,7 +353,7 @@ export default function GalleryPage() {
             className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90 p-4"
             onClick={closeLightbox}
           >
-            <button 
+            <button
               className="absolute top-4 right-4 text-white hover:text-gray-300 z-10"
               onClick={(e) => {
                 e.stopPropagation();
@@ -343,8 +363,8 @@ export default function GalleryPage() {
             >
               <X className="w-8 h-8" />
             </button>
-            
-            <button 
+
+            <button
               className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10"
               onClick={(e) => {
                 e.stopPropagation();
@@ -354,8 +374,8 @@ export default function GalleryPage() {
             >
               <ChevronLeft className="w-10 h-10" />
             </button>
-            
-            <button 
+
+            <button
               className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 z-10"
               onClick={(e) => {
                 e.stopPropagation();
@@ -365,8 +385,8 @@ export default function GalleryPage() {
             >
               <ChevronRight className="w-10 h-10" />
             </button>
-            
-            <div 
+
+            <div
               className="relative max-w-5xl max-h-[80vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
