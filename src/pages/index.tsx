@@ -6,7 +6,7 @@ import Head from "next/head";
 export default function Home() {
   return (
     <>
-    <Head>
+      <Head>
         <title>Home | Purna Chandra Diagnostic</title>
       </Head>
       {/* Hero Section */}
@@ -226,87 +226,107 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Doctors */}
+      {/* Laboratory Section */}
       <section className="py-16 md:py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 md:mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-              Our Expert Doctors
+              State-of-the-Art Laboratory
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-              Meet our team of experienced and dedicated medical professionals committed to
-              providing exceptional care.
+              Advanced diagnostic testing with precision, accuracy, and care
             </p>
+            <div className="inline-block mt-4 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-2 rounded-full text-sm font-medium">
+              C Grade Laboratory • Certified by Government of Nepal
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                name: "Dr. Sarah Johnson",
-                specialty: "Cardiologist",
-                image: "/images/doctor1.jpg",
-              },
-              {
-                name: "Dr. Michael Chen",
-                specialty: "Neurologist",
-                image: "/images/doctor2.jpg",
-              },
-              {
-                name: "Dr. Emily Williams",
-                specialty: "Pediatrician",
-                image: "/images/doctor3.jpg",
-              },
-              {
-                name: "Dr. David Miller",
-                specialty: "Orthopedic Surgeon",
-                image: "/images/doctor4.jpg",
-              },
-            ].map((doctor, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-lg shadow-md overflow-hidden group hover:shadow-lg transition-all duration-300 border border-gray-100"
-              >
-                <div className="relative h-64 w-full bg-blue-50">
-                  <div className="absolute inset-0 flex items-center justify-center text-blue-300 text-5xl">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-16 w-16"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="order-2 lg:order-1">
+              <div className="bg-blue-50 p-8 md:p-10 rounded-xl shadow-md">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-6">
+                  Cutting-Edge Diagnostics
+                </h3>
+
+                <p className="text-gray-700 mb-6 leading-relaxed">
+                  Our advanced laboratory is equipped with the latest diagnostic technology,
+                  providing accurate and timely results for a comprehensive range of tests. From
+                  routine blood work to specialized molecular diagnostics, our state-of-the-art
+                  equipment ensures precision in every analysis. Our laboratory operates under
+                  strict quality control protocols, with each test performed by highly trained
+                  technicians who combine technical expertise with meticulous attention to detail.
+                </p>
+
+                <p className="text-gray-700 mb-6 leading-relaxed">
+                  We understand that accurate diagnostics form the foundation of effective
+                  healthcare, which is why our laboratory maintains rigorous standards that meet and
+                  exceed industry benchmarks. As a{" "}
+                  <span className="font-semibold text-blue-700">
+                    C Grade laboratory certified by the Government of Nepal
+                  </span>
+                  , our testing services provide physicians with reliable information for confident
+                  diagnoses and treatment decisions. We're committed to quick turnaround times
+                  without compromising accuracy, with many routine tests available within days.
+                </p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <div className="font-medium text-blue-600 mb-1">Automated Analysis</div>
+                    <div className="text-sm text-gray-600">High-precision results</div>
+                  </div>
+                  <div className="bg-white p-4 rounded-lg shadow-sm">
+                    <div className="font-medium text-blue-600 mb-1">Rapid Turnaround</div>
+                    <div className="text-sm text-gray-600">Results when you need them</div>
                   </div>
                 </div>
-                <div className="p-5 text-center">
-                  <h3 className="text-xl font-semibold text-gray-800 group-hover:text-blue-600 transition-colors">
-                    {doctor.name}
-                  </h3>
-                  <p className="text-blue-600 mb-3">{doctor.specialty}</p>
-                  <Link
-                    href="/doctors"
-                    className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-                  >
-                    View Profile <span className="ml-1">→</span>
-                  </Link>
+              </div>
+            </div>
+
+            <div className="order-1 lg:order-2">
+              <div className="relative h-[400px] w-full rounded-xl overflow-hidden shadow-lg">
+                <Image
+                  src="/images/laboratory.png"
+                  alt="Modern medical laboratory with advanced diagnostic equipment"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                />
+                {/* Overlay with certification information */}
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 to-transparent flex flex-col items-center justify-end p-6">
+                  <span className="text-white text-xl font-medium">Excellence in Diagnostics</span>
+                  <div className="bg-green-800/70 px-4 py-1 rounded-full mt-2">
+                    <span className="text-blue-100 text-sm">
+                      C Grade • Government of Nepal Certified
+                    </span>
+                  </div>
                 </div>
               </div>
-            ))}
+            </div>
           </div>
 
-          <div className="text-center mt-12">
-            <Link
-              href="/doctors"
-              className="inline-block border border-blue-600 text-blue-600 hover:bg-blue-50 px-6 py-3 rounded-md font-medium transition-all duration-300"
-            >
-              View All Doctors
-            </Link>
+          <div className="max-w-4xl mx-auto mt-12 p-5 bg-gray-50 rounded-lg border border-gray-200 flex items-center">
+            <div className="mr-4 bg-blue-100 p-3 rounded-full">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-6 w-6 text-blue-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+                />
+              </svg>
+            </div>
+            <div className="text-gray-700">
+              <span className="font-semibold">Government of Nepal Certified:</span> Our C Grade
+              laboratory certification ensures that we meet all national standards for diagnostic
+              facilities, equipment calibration, testing procedures, and staff qualifications.
+            </div>
           </div>
         </div>
       </section>
