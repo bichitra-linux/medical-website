@@ -166,10 +166,7 @@ export default function GalleryPage() {
     <>
       <Head>
         <title>Photo Gallery | Purna Chandra Diagnostic Center</title>
-        <meta 
-          name="description" 
-          content="Browse our gallery of facility photos, team members, and events at Purna Chandra Diagnostic Center." 
-        />
+        
       </Head>
 
       {/* Hero Section */}

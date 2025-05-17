@@ -108,11 +108,8 @@ export default function ContactPage() {
   return (
     <>
       <Head>
-        <title>Contact Us | Purna Chandra Diagnostic Center Health Services</title>
-        <meta
-          name="description"
-          content="Contact Purna Chandra Diagnostic Center Health Services for appointments, inquiries, or emergencies. Our team is here to help you with all your healthcare needs."
-        />
+        <title>Contact Us | Purna Chandra Diagnostic Center</title>
+        
       </Head>
 
       <section className="bg-gradient-to-r from-blue-50 to-blue-100 py-16 md:py-20">

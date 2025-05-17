@@ -6,8 +6,7 @@ export default function TermsPage() {
   return (
     <>
       <Head>
-        <title>{termsData.title} | Purna Chandra Diagnostic Center Health Services</title>
-        <meta name="description" content={termsData.subtitle} />
+        <title>Terms of Services | Purna Chandra Diagnostic Center</title>
       </Head>
 
       {/* Hero Section */}

@@ -125,7 +125,7 @@ export default function StaffsPage() {
   return (
     <>
       <Head>
-        <title>Our Staffs</title>
+        <title>Our Staffs | Purna Chandra Diagnostic Center</title>
       </Head>
 
       {/* Hero */}

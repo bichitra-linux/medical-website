@@ -4,38 +4,38 @@
     "milestones": [
       {
         "id": "1",
-        "year": "2005",
+        "year": "2006",
         "label": "Founding Year",
         "title": "Establishment of Purna Chandra Diagnostic Center",
-        "description": "Founded by Dr. Rebecca Johnson with a small team of dedicated healthcare professionals, Purna Chandra Diagnostic Center opened its doors to provide comprehensive medical services to the community."
+        "description": ""
       },
       {
         "id": "2",
         "year": "2010",
         "label": "Expansion",
         "title": "New Specializations & Services",
-        "description": "Expanded our medical services to include specialized departments for cardiology, pediatrics, and orthopedics, while also investing in advanced diagnostic equipment."
+        "description": ""
       },
       {
         "id": "3",
         "year": "2015",
         "label": "New Facility",
         "title": "State-of-the-Art Medical Center",
-        "description": "Relocated to our current modern facility, featuring cutting-edge medical technology, comfortable patient rooms, and an expanded team of medical specialists."
+        "description": ""
       },
       {
         "id": "4",
         "year": "2020",
         "label": "Innovation",
         "title": "Telemedicine & Digital Health",
-        "description": "Launched our comprehensive telemedicine program and patient portal, making healthcare more accessible to all members of our community, regardless of location."
+        "description": ""
       },
       {
         "id": "5",
         "year": "Today",
         "label": "Continuing Care",
         "title": "Leading Healthcare Provider",
-        "description": "Today, Purna Chandra Diagnostic Center stands as a trusted healthcare institution serving thousands of patients annually with a team of over 25 specialists and a commitment to excellence in healthcare."
+        "description": ""
       }
     ]
   }

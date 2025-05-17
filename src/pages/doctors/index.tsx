@@ -125,8 +125,8 @@ export default function DoctorsPage() {
   return (
     <>
       <Head>
-        <title>Our Doctors</title>
-      </Head>
+              <title>Our Doctors | Purna Chandra Diagnostic Center</title>
+            </Head>
 
       {/* Hero */}
       <section className="bg-gradient-to-r from-blue-50 to-blue-100 py-16 md:py-20 text-center">

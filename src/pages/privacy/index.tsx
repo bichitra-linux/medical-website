@@ -6,8 +6,7 @@ export default function PrivacyPage() {
   return (
     <>
       <Head>
-        <title>{privacyData.title} | Purna Chandra Diagnostic Center Health Services</title>
-        <meta name="description" content={privacyData.subtitle} />
+        <title>Privacy Policy | Purna Chandra Diagnostic Center</title>
       </Head>
 
       {/* Hero Section */}

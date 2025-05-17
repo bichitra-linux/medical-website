@@ -12,10 +12,15 @@ import teamData from "@/lib/team.json";
 import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Heart as HeartIcon } from "lucide-react";
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Card as CarouselCard } from "@/components/ui/card";
-
-
+import Head from "next/head";
 
 // Define interfaces for the data structure
 interface Doctor {
@@ -45,7 +50,6 @@ const getIconComponent = (iconName: string) => {
 };
 
 export default function AboutUs() {
-
   // State for API data
   const [activeDoctors, setActiveDoctors] = useState<Doctor[]>([]);
   const [activeStaffs, setActiveStaffs] = useState<Staff[]>([]);
@@ -59,11 +63,11 @@ export default function AboutUs() {
       try {
         setIsLoadingDoctors(true);
         const res = await fetch("/api/doctors");
-        
+
         if (!res.ok) {
           throw new Error("Failed to fetch doctors");
         }
-        
+
         const data = await res.json();
         setActiveDoctors(data.activeDoctors);
       } catch (err) {
@@ -73,7 +77,7 @@ export default function AboutUs() {
         setIsLoadingDoctors(false);
       }
     }
-    
+
     fetchDoctors();
   }, []);
 
@@ -83,11 +87,11 @@ export default function AboutUs() {
       try {
         setIsLoadingStaffs(true);
         const res = await fetch("/api/staffs");
-        
+
         if (!res.ok) {
           throw new Error("Failed to fetch staff");
         }
-        
+
         const data = await res.json();
         setActiveStaffs(data.activeStaffs);
       } catch (err) {
@@ -97,12 +101,15 @@ export default function AboutUs() {
         setIsLoadingStaffs(false);
       }
     }
-    
+
     fetchStaffs();
   }, []);
 
   return (
     <>
+      <Head>
+        <title>About Us | Purna Chandra Diagnostic center</title>
+      </Head>
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-blue-50 to-blue-100 py-16 md:py-20">
         <div className="container mx-auto px-4">
@@ -144,7 +151,7 @@ export default function AboutUs() {
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/50 to-transparent flex items-end justify-center pb-6">
                   <span className="text-white text-lg font-medium">
-                    Excellence in Healthcare Since 2005
+                    Excellence in Healthcare Since 2006
                   </span>
                 </div>
               </div>
@@ -186,6 +193,57 @@ export default function AboutUs() {
                 </CardContent>
               </Card>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* We Are Registered */}
+      <section className="py-16 bg-blue-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">We Are Registered</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Fully licensed and accredited with the following governmental and regulatory bodies
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Nepal Medical Council */}
+            <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                {getIconComponent("Stethoscope") || <Heart className="h-6 w-6 text-blue-600" />}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">Nepal Medical Council</h3>
+              <p className="text-gray-600 mb-2">Registration No: NMC-2005-4376</p>
+              <p className="text-sm text-gray-500">Licensed since 2005</p>
+            </div>
+
+            {/* Ministry of Health */}
+            <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                {getIconComponent("Building") || <Target className="h-6 w-6 text-blue-600" />}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">Ministry of Health</h3>
+              <p className="text-gray-600 mb-2">License No: MOH/DC/2005/583</p>
+              <p className="text-sm text-gray-500">Compliant with National Healthcare Standards</p>
+            </div>
+
+            {/* Department of Health Services */}
+            <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                {getIconComponent("Certificate") || <User className="h-6 w-6 text-blue-600" />}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">Dept. of Health Services</h3>
+              <p className="text-gray-600 mb-2">Registration No: DHS/DC/2005/219</p>
+              <p className="text-sm text-gray-500">Certified Diagnostic Center</p>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-gray-600 italic">
+              "Our commitment to quality and compliance with regulatory standards ensures that you
+              receive the highest quality of care and diagnostics."
+            </p>
           </div>
         </div>
       </section>
@@ -276,9 +334,7 @@ export default function AboutUs() {
 
           {/* Doctors Section */}
           <div className="mb-16">
-            <h3 className="text-2xl font-bold text-gray-800 mb-2 text-center">
-              Medical Doctors
-            </h3>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2 text-center">Medical Doctors</h3>
             <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
               Our experienced physicians and specialists
             </p>
@@ -320,7 +376,9 @@ export default function AboutUs() {
                         <p className="text-blue-600 mb-1">{doctor.specialty}</p>
                         <p className="text-sm text-blue-500 mb-3">NMC: {doctor.nmcNumber}</p>
                         <p className="text-gray-600 mb-4">
-                          {doctor.bio.length > 120 ? `${doctor.bio.substring(0, 120)}...` : doctor.bio}
+                          {doctor.bio.length > 120
+                            ? `${doctor.bio.substring(0, 120)}...`
+                            : doctor.bio}
                         </p>
                       </div>
                     </div>
@@ -342,9 +400,7 @@ export default function AboutUs() {
 
           {/* Staff Section */}
           <div className="mb-16">
-            <h3 className="text-2xl font-bold text-gray-800 mb-2 text-center">
-              Support Staff
-            </h3>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2 text-center">Support Staff</h3>
             <p className="text-gray-600 mb-8 text-center max-w-2xl mx-auto">
               The dedicated team that ensures seamless care
             </p>
@@ -448,8 +504,8 @@ export default function AboutUs() {
               ))}
             </CarouselContent>
             <div className="flex justify-center gap-2 mt-4">
-              <CarouselPrevious className="relative static" />
-              <CarouselNext className="relative static" />
+              <CarouselPrevious className="relative" />
+              <CarouselNext className="relative" />
             </div>
           </Carousel>
         </div>

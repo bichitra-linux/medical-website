@@ -12,8 +12,8 @@ export default function FAQPage() {
   return (
     <>
       <Head>
-        <title>Frequently Asked Questions | Purna Chandra Diagnostic Center Health Services</title>
-        <meta name="description" content={faqData.subtitle} />
+        <title>Frequently Asked Questions | Purna Chandra Diagnostic Center </title>
+        
       </Head>
 
       {/* Hero Section */}
