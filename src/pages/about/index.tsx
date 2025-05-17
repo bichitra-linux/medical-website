@@ -119,7 +119,7 @@ export default function AboutUs() {
             </h1>
             <p className="text-lg text-gray-600 mb-6 leading-relaxed">
               Dedicated to providing exceptional healthcare services with compassion, expertise, and
-              a patient-centered approach since 2005.
+              a patient-centered approach since 2006.
             </p>
           </div>
         </div>
@@ -137,19 +137,34 @@ export default function AboutUs() {
 
           <div className="grid md:grid-cols-2 gap-8 md:gap-16 items-center">
             <div className="order-2 md:order-1">
-              <div className="relative h-[400px] rounded-xl overflow-hidden shadow-lg bg-gradient-to-br from-blue-50 to-blue-100">
-                <div className="absolute inset-0 flex items-center justify-center">
+              <div className="relative h-[400px] rounded-xl overflow-hidden shadow-lg">
+                {/* Background Image */}
+                <Image
+                  src="/images/medical-background.jpg"
+                  alt="Medical professionals in a healthcare setting"
+                  fill
+                  className="object-cover brightness-95"
+                  priority
+                />
+
+                {/* Overlay to ensure icon and text visibility */}
+                <div className="absolute inset-0 bg-blue-600/10"></div>
+
+                {/* Stethoscope/Heart Icon */}
+                <div className="absolute inset-0 flex items-center justify-center z-10">
                   {getIconComponent("Stethoscope") ? (
-                    <div className="transform scale-[6] text-blue-400 opacity-70">
+                    <div className="transform scale-[6] text-blue-600 opacity-80">
                       {getIconComponent("Stethoscope")}
                     </div>
                   ) : (
-                    <div className="transform scale-[6] text-blue-400 opacity-70">
+                    <div className="transform scale-[6] text-blue-600 opacity-80">
                       <Heart className="h-12 w-12" />
                     </div>
                   )}
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/50 to-transparent flex items-end justify-center pb-6">
+
+                {/* Text at bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/70 to-transparent flex items-end justify-center pb-6 z-10">
                   <span className="text-white text-lg font-medium">
                     Excellence in Healthcare Since 2006
                   </span>
@@ -244,6 +259,88 @@ export default function AboutUs() {
               "Our commitment to quality and compliance with regulatory standards ensures that you
               receive the highest quality of care and diagnostics."
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Our Laboratory */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-800 mb-4">Our Laboratory</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              State-of-the-art diagnostics facility with advanced technology and expert technicians
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center mb-12">
+            <div className="order-2 md:order-1">
+              <div className="bg-blue-50 p-8 rounded-lg shadow-md border-l-4 border-blue-500">
+                <h3 className="text-2xl font-semibold text-gray-800 mb-4">
+                  Comprehensive Testing Services
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Our laboratory offers a wide range of diagnostic services, from routine blood work
+                  to specialized tests, all conducted with precision and care.
+                </p>
+                <ul className="space-y-3">
+                  {["Hematology", "Biochemistry", "Microbiology", "Serology"].map((service) => (
+                    <li key={service} className="flex items-start">
+                      <div className="mt-1 mr-3 text-blue-600">
+                        {getIconComponent("Check") || (
+                          <div className="h-5 w-5 rounded-full bg-blue-100 flex items-center justify-center">
+                            ✓
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-gray-700">{service}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="order-1 md:order-2">
+              <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-8 rounded-lg text-white shadow-lg">
+                <h3 className="text-2xl font-semibold mb-4">Advanced Equipment</h3>
+                <p className="text-blue-100 mb-6">
+                  Our laboratory is equipped with the latest diagnostic technology, ensuring
+                  accurate and timely results.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/10 p-4 rounded-lg backdrop-blur-sm">
+                    <h4 className="font-semibold mb-2">Automated Analyzers</h4>
+                  </div>
+                  <div className="bg-white/10 p-4 rounded-lg backdrop-blur-sm">
+                    <h4 className="font-semibold mb-2">Digital Imaging</h4>
+                  </div>
+                  <div className="bg-white/10 p-4 rounded-lg backdrop-blur-sm">
+                    <h4 className="font-semibold mb-2">PCR Technology</h4>
+                  </div>
+                  <div className="bg-white/10 p-4 rounded-lg backdrop-blur-sm">
+                    <h4 className="font-semibold mb-2">ELISA Systems</h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 max-w-4xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center">
+              <div className="mb-4 md:mb-0 md:mr-6 flex-shrink-0">
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+                  {getIconComponent("ShieldCheck") || <div className="text-2xl font-bold">QA</div>}
+                </div>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Quality Assurance</h3>
+                <p className="text-gray-600">
+                  Our laboratory adheres to strict quality control protocols and participates in
+                  external quality assessment programs. We are committed to maintaining the highest
+                  standards of accuracy and reliability in all our diagnostic services.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
