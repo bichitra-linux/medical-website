@@ -315,7 +315,7 @@ export default function AboutUs() {
                     <h4 className="font-semibold mb-2">Digital Imaging</h4>
                   </div>
                   <div className="bg-white/10 p-4 rounded-lg backdrop-blur-sm">
-                    <h4 className="font-semibold mb-2">PCR Technology</h4>
+                    <h4 className="font-semibold mb-2">Radiography</h4>
                   </div>
                   <div className="bg-white/10 p-4 rounded-lg backdrop-blur-sm">
                     <h4 className="font-semibold mb-2">ELISA Systems</h4>
