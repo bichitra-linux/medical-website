@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Home | Purna Chandra Diagnostic</title>
+        <title>Home | Purna Chandra Diagnostic Center</title>
       </Head>
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-blue-50 to-blue-100 py-16 md:py-24">
