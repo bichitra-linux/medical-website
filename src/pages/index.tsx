@@ -136,7 +136,7 @@ export default function Home() {
       {/* Stats Section */}
       <section className="bg-white py-12 md:py-16">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 text-center">
             <div className="p-6 bg-blue-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
               <h3 className="text-blue-600 text-3xl font-bold mb-2">25+</h3>
               <p className="text-gray-700 font-medium">Experienced Doctors</p>
