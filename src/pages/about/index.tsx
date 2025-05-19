@@ -222,35 +222,81 @@ export default function AboutUs() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Nepal Medical Council */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {/* Company Registration Office */}
             <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 flex flex-col items-center text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                {getIconComponent("Stethoscope") || <Heart className="h-6 w-6 text-blue-600" />}
+                {getIconComponent("Building") || <Target className="h-6 w-6 text-blue-600" />}
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-800">Nepal Medical Council</h3>
-              <p className="text-gray-600 mb-2">Registration No: NMC-2005-4376</p>
-              <p className="text-sm text-gray-500">Licensed since 2005</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">
+                Company Registration Office
+              </h3>
+              <p className="text-gray-600 mb-2">Tripureshwor, Kathmandu</p>
+              <p className="text-sm text-gray-500">Registered as Purna Chandra Diagnostic Center</p>
+            </div>
+
+            {/* Income Tax Office */}
+            <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                {getIconComponent("Receipt") || <Target className="h-6 w-6 text-blue-600" />}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">Income Tax Office (PAN)</h3>
+              <p className="text-gray-600 mb-2">Kathmandu</p>
+              <p className="text-sm text-gray-500">Registered for tax compliance</p>
+            </div>
+
+            {/* District Health Office */}
+            <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                {getIconComponent("FirstAid") || <User className="h-6 w-6 text-blue-600" />}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">District Health Office</h3>
+              <p className="text-gray-600 mb-2">Teku, Kathmandu</p>
+              <p className="text-sm text-gray-500">Licensed healthcare provider</p>
+            </div>
+
+            {/* National Public Health Lab */}
+            <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                {getIconComponent("Microscope") || <Heart className="h-6 w-6 text-blue-600" />}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">
+                National Public Health Lab
+              </h3>
+              <p className="text-gray-600 mb-2">Teku, Kathmandu</p>
+              <p className="text-sm text-gray-500">Certified laboratory services</p>
+            </div>
+
+            {/* Ministry of Labour */}
+            <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                {getIconComponent("Briefcase") || <Target className="h-6 w-6 text-blue-600" />}
+              </div>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">Ministry of Labour</h3>
+              <p className="text-gray-600 mb-2">SinghaDarbar, Kathmandu</p>
+              <p className="text-sm text-gray-500">Employment and Social Security compliant</p>
             </div>
 
             {/* Ministry of Health */}
             <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 flex flex-col items-center text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                {getIconComponent("Building") || <Target className="h-6 w-6 text-blue-600" />}
+                {getIconComponent("Stethoscope") || <Target className="h-6 w-6 text-blue-600" />}
               </div>
               <h3 className="text-xl font-semibold mb-2 text-gray-800">Ministry of Health</h3>
-              <p className="text-gray-600 mb-2">License No: MOH/DC/2005/583</p>
+              <p className="text-gray-600 mb-2">Ramshahpath, Kathmandu</p>
               <p className="text-sm text-gray-500">Compliant with National Healthcare Standards</p>
             </div>
 
-            {/* Department of Health Services */}
+            {/* Kathmandu Metropolitan City */}
             <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 flex flex-col items-center text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                {getIconComponent("Certificate") || <User className="h-6 w-6 text-blue-600" />}
+                {getIconComponent("Landmark") || <User className="h-6 w-6 text-blue-600" />}
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-800">Dept. of Health Services</h3>
-              <p className="text-gray-600 mb-2">Registration No: DHS/DC/2005/219</p>
-              <p className="text-sm text-gray-500">Certified Diagnostic Center</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800">
+                Kathmandu Metropolitan City
+              </h3>
+              <p className="text-gray-600 mb-2">Sundahara, Kathmandu</p>
+              <p className="text-sm text-gray-500">Municipal business permit holder</p>
             </div>
           </div>
 
