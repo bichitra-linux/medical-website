@@ -149,10 +149,6 @@ export default function Home() {
               <h3 className="text-blue-600 text-3xl font-bold mb-2">10+</h3>
               <p className="text-gray-700 font-medium">Years Experience</p>
             </div>
-            <div className="p-6 bg-blue-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300">
-              <h3 className="text-blue-600 text-3xl font-bold mb-2">24/7</h3>
-              <p className="text-gray-700 font-medium">Medical Support</p>
-            </div>
           </div>
         </div>
       </section>
