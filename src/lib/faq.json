@@ -1,36 +1,31 @@
 {
-    "title": "Common Questions",
-    "subtitle": "Get answers to frequently asked questions about our medical services",
-    "faqs": [
-      {
-        "id": "appointment",
-        "question": "How do I schedule an appointment?",
-        "answer": "You can schedule an appointment by calling our office, using our online booking system, or through the patient portal. We offer same-day appointments for urgent needs and extended hours on select days."
-      },
-      {
-        "id": "insurance",
-        "question": "What insurance plans do you accept?",
-        "answer": "We accept most major insurance plans, including Purna Chandra Diagnostic Center and Medicaid. Please contact our billing department with your specific insurance information to verify coverage before your visit."
-      },
-      {
-        "id": "preparation",
-        "question": "How do I prepare for my appointment?",
-        "answer": "Please arrive 15 minutes early to complete any necessary paperwork. Bring your insurance card, photo ID, list of current medications, and any relevant medical records or test results. For specific procedures, our staff will provide detailed preparation instructions."
-      },
-      {
-        "id": "records",
-        "question": "How do I access my medical records?",
-        "answer": "You can access your medical records through our secure patient portal. To request physical copies, please complete a medical records release form available at our reception desk or on our website."
-      },
-      {
-        "id": "emergency",
-        "question": "What should I do in case of a medical emergency?",
-        "answer": "For life-threatening emergencies, call 911 immediately. Our emergency care department is open 24/7 for urgent medical needs. For after-hours non-emergency concerns, you can reach our on-call physician through our main office number."
-      },
-      {
-        "id": "telemedicine",
-        "question": "How do telemedicine appointments work?",
-        "answer": "Telemedicine appointments are conducted through our secure video platform. You'll receive a link before your appointment time. Ensure you have a good internet connection, a device with a camera and microphone, and are in a private location for your consultation."
-      }
-    ]
-  }
+  "title": "Common Questions",
+  "subtitle": "Get answers to frequently asked questions about our medical services",
+  "faqs": [
+    {
+      "id": "appointment",
+      "question": "How do I schedule an appointment?",
+      "answer": "You can schedule an appointment by calling our office, using our online booking system, or through the patient portal. We offer same-day appointments for urgent needs and extended hours on select days."
+    },
+
+    {
+      "id": "preparation",
+      "question": "How do I prepare for my appointment?",
+      "answer": "Please arrive 15 minutes early to complete any necessary paperwork. Bring your insurance card, photo ID, list of current medications, and any relevant medical records or test results. For specific procedures, our staff will provide detailed preparation instructions."
+    },
+    {
+      "id": "identification",
+      "question": "What Document Do I need while visiting the medical?",
+      "answer": "You must carry a proper identification Document (Citizenship/ National ID/ Passport) during your visit, Patients comming for Foreign Employment Medical Test must Carry Their Passport along with 4 Passport Size Photos."
+    },
+
+    {
+      "id": "telemedicine",
+      "question": "How do telemedicine appointments work?",
+      "answer": [
+        "*******THIS SERVICE IS CURRENTLY SUSPENDED**********",
+        "Telemedicine appointments are conducted through our secure video platform. You'll receive a link before your appointment time. Ensure you have a good internet connection, a device with a camera and microphone, and are in a private location for your consultation."
+      ]
+    }
+  ]
+}
