@@ -1,6 +1,16 @@
 import { getAuth } from "@clerk/nextjs/server";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { adminDb } from "@/pages/api/firebase/firebase-admin";
+import { Timestamp } from "firebase-admin/firestore";
+
+// Define proper types for the activity data
+interface Activity {
+  id: string;
+  type: "appointment" | "service" | "gallery" | string;
+  message: string;
+  time: string;
+  status: "success" | "pending" | "error" | string;
+}
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { userId } = getAuth(req);
@@ -27,16 +37,26 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // If we have a dedicated activities collection
     if (!activitiesSnap.empty) {
-      const activities = activitiesSnap.docs.map(doc => {
+      const activities: Activity[] = activitiesSnap.docs.map(doc => {
         const data = doc.data();
-        // Format the relative time based on timestamp
-        const timestamp = data.timestamp.toDate();
+        
+        // Safely convert Firestore timestamp to Date
+        let timestamp: Date;
+        try {
+          timestamp = data.timestamp instanceof Timestamp
+            ? data.timestamp.toDate()
+            : new Date(data.timestamp);
+        } catch (error) {
+          console.warn(`Invalid timestamp for activity ${doc.id}:`, error);
+          timestamp = new Date(); // Fallback to current time
+        }
+        
         const timeAgo = getTimeAgo(timestamp);
         
         return {
           id: doc.id,
           type: data.type || "appointment", // Default to appointment type if missing
-          message: data.message,
+          message: data.message || "Activity recorded",
           time: timeAgo,
           status: data.status || "success" // Default to success if missing
         };
@@ -47,62 +67,103 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     
     // If no activities collection or it's empty, generate activities from recent data
     else {
-      // Get recent appointments, services, and gallery updates
-      const [appointmentsSnap, servicesSnap, gallerySnap] = await Promise.all([
-        adminDb.collection("appointments")
+      const activities: Activity[] = [];
+
+      try {
+        // Get recent appointments
+        const appointmentsSnap = await adminDb.collection("appointments")
           .where("createdAt", ">=", twoDaysAgo)
           .orderBy("createdAt", "desc")
           .limit(5)
-          .get(),
-        adminDb.collection("services")
+          .get();
+          
+        appointmentsSnap.forEach(doc => {
+          const data = doc.data();
+          if (data && data.createdAt) {
+            try {
+              const createdAt = data.createdAt instanceof Timestamp
+                ? data.createdAt.toDate()
+                : new Date(data.createdAt);
+                
+              activities.push({
+                id: doc.id,
+                type: "appointment",
+                message: `New appointment scheduled: ${data.patientName || 'Patient'}`,
+                time: getTimeAgo(createdAt),
+                status: "success"
+              });
+            } catch (error) {
+              console.warn(`Invalid timestamp for appointment ${doc.id}:`, error);
+            }
+          }
+        });
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+
+      try {
+        // Get recent service updates
+        const servicesSnap = await adminDb.collection("services")
           .where("updatedAt", ">=", twoDaysAgo)
           .orderBy("updatedAt", "desc")
           .limit(3)
-          .get(),
-        adminDb.collection("gallery")
+          .get();
+          
+        servicesSnap.forEach(doc => {
+          const data = doc.data();
+          if (data && data.updatedAt) {
+            try {
+              const updatedAt = data.updatedAt instanceof Timestamp
+                ? data.updatedAt.toDate()
+                : new Date(data.updatedAt);
+                
+              activities.push({
+                id: doc.id,
+                type: "service",
+                message: `Service updated: ${data.name || 'Unknown service'}`,
+                time: getTimeAgo(updatedAt),
+                status: "success"
+              });
+            } catch (error) {
+              console.warn(`Invalid timestamp for service ${doc.id}:`, error);
+            }
+          }
+        });
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      }
+
+      try {
+        // Get recent gallery updates
+        const gallerySnap = await adminDb.collection("gallery")
           .where("uploadedAt", ">=", twoDaysAgo)
           .orderBy("uploadedAt", "desc")
           .limit(2)
-          .get(),
-      ]);
-
-      const activities = [];
-
-      // Process appointments
-      appointmentsSnap.forEach(doc => {
-        const data = doc.data();
-        activities.push({
-          id: doc.id,
-          type: "appointment",
-          message: `New appointment scheduled: ${data.patientName}`,
-          time: getTimeAgo(data.createdAt.toDate()),
-          status: "success"
+          .get();
+          
+        gallerySnap.forEach(doc => {
+          const data = doc.data();
+          if (data && data.uploadedAt) {
+            try {
+              const uploadedAt = data.uploadedAt instanceof Timestamp
+                ? data.uploadedAt.toDate()
+                : new Date(data.uploadedAt);
+                
+              activities.push({
+                id: doc.id,
+                type: "gallery",
+                message: "New gallery image uploaded",
+                time: getTimeAgo(uploadedAt),
+                status: "success"
+              });
+            } catch (error) {
+              console.warn(`Invalid timestamp for gallery item ${doc.id}:`, error);
+            }
+          }
         });
-      });
-
-      // Process services
-      servicesSnap.forEach(doc => {
-        const data = doc.data();
-        activities.push({
-          id: doc.id,
-          type: "service",
-          message: `Service updated: ${data.name}`,
-          time: getTimeAgo(data.updatedAt.toDate()),
-          status: "success"
-        });
-      });
-
-      // Process gallery updates
-      gallerySnap.forEach(doc => {
-        const data = doc.data();
-        activities.push({
-          id: doc.id,
-          type: "gallery",
-          message: "New gallery image uploaded",
-          time: getTimeAgo(data.uploadedAt.toDate()),
-          status: "success"
-        });
-      });
+      } catch (error) {
+        console.error("Error fetching gallery items:", error);
+      }
 
       // Sort activities by timestamp (newest first)
       activities.sort((a, b) => {

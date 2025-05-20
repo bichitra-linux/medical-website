@@ -124,12 +124,12 @@ export default function Dashboard() {
       setRecentActivity(activityData.activities);
 
       // Fetch upcoming appointments
-      const appointmentsResponse = await fetch('/api/admin/dashboard/appointments');
+      /*const appointmentsResponse = await fetch('/api/admin/dashboard/appointments');
       if (!appointmentsResponse.ok) {
         throw new Error('Failed to load upcoming appointments');
       }
       const appointmentsData = await appointmentsResponse.json();
-      setUpcomingAppointments(appointmentsData.appointments);
+      setUpcomingAppointments(appointmentsData.appointments);*/
 
     } catch (err) {
       console.error("Dashboard data fetch error:", err);
